@@ -1,0 +1,787 @@
+Index: flutter_app/android/.gitignore
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- flutter_app/android/.gitignore	(date 1616184426735)
++++ flutter_app/android/.gitignore	(date 1616184426735)
+@@ -0,0 +1,11 @@
++gradle-wrapper.jar
++/.gradle
++/captures/
++/gradlew
++/gradlew.bat
++/local.properties
++GeneratedPluginRegistrant.java
++
++# Remember to never publicly share your keystore.
++# See https://flutter.dev/docs/deployment/android#reference-the-keystore-from-the-app
++key.properties
+Index: flutter_app/android/gradle.properties
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>x-windows-949
+===================================================================
+--- flutter_app/android/gradle.properties	(date 1617765055759)
++++ flutter_app/android/gradle.properties	(date 1617765055759)
+@@ -0,0 +1,3 @@
++org.gradle.jvmargs=-Xmx1536M
++android.useAndroidX=true
++android.enableJetifier=true
+Index: flutter_app/android/app/src/main/res/values/styles.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- flutter_app/android/app/src/main/res/values/styles.xml	(date 1616184426751)
++++ flutter_app/android/app/src/main/res/values/styles.xml	(date 1616184426751)
+@@ -0,0 +1,18 @@
++<?xml version="1.0" encoding="utf-8"?>
++<resources>
++    <!-- Theme applied to the Android Window while the process is starting when the OS's Dark Mode setting is off -->
++    <style name="LaunchTheme" parent="@android:style/Theme.Light.NoTitleBar">
++        <!-- Show a splash screen on the activity. Automatically removed when
++             Flutter draws its first frame -->
++        <item name="android:windowBackground">@drawable/launch_background</item>
++    </style>
++    <!-- Theme applied to the Android Window as soon as the process has started.
++         This theme determines the color of the Android Window while your
++         Flutter UI initializes, as well as behind your Flutter UI while its
++         running.
++         
++         This Theme is only used starting with V2 of Flutter's Android embedding. -->
++    <style name="NormalTheme" parent="@android:style/Theme.Light.NoTitleBar">
++        <item name="android:windowBackground">?android:colorBackground</item>
++    </style>
++</resources>
+Index: flutter_app/android/gradle/wrapper/gradle-wrapper.properties
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>x-windows-949
+===================================================================
+--- flutter_app/android/gradle/wrapper/gradle-wrapper.properties	(date 1616184426751)
++++ flutter_app/android/gradle/wrapper/gradle-wrapper.properties	(date 1616184426751)
+@@ -0,0 +1,6 @@
++#Fri Jun 23 08:50:38 CEST 2017
++distributionBase=GRADLE_USER_HOME
++distributionPath=wrapper/dists
++zipStoreBase=GRADLE_USER_HOME
++zipStorePath=wrapper/dists
++distributionUrl=https\://services.gradle.org/distributions/gradle-6.7-all.zip
+Index: flutter_app/android/settings.gradle
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- flutter_app/android/settings.gradle	(date 1616184426751)
++++ flutter_app/android/settings.gradle	(date 1616184426751)
+@@ -0,0 +1,11 @@
++include ':app'
++
++def localPropertiesFile = new File(rootProject.projectDir, "local.properties")
++def properties = new Properties()
++
++assert localPropertiesFile.exists()
++localPropertiesFile.withReader("UTF-8") { reader -> properties.load(reader) }
++
++def flutterSdkPath = properties.getProperty("flutter.sdk")
++assert flutterSdkPath != null, "flutter.sdk not set in local.properties"
++apply from: "$flutterSdkPath/packages/flutter_tools/gradle/app_plugin_loader.gradle"
+Index: flutter_app/android/app/src/main/res/values-night/styles.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- flutter_app/android/app/src/main/res/values-night/styles.xml	(date 1616184426751)
++++ flutter_app/android/app/src/main/res/values-night/styles.xml	(date 1616184426751)
+@@ -0,0 +1,18 @@
++<?xml version="1.0" encoding="utf-8"?>
++<resources>
++    <!-- Theme applied to the Android Window while the process is starting when the OS's Dark Mode setting is on -->
++    <style name="LaunchTheme" parent="@android:style/Theme.Black.NoTitleBar">
++        <!-- Show a splash screen on the activity. Automatically removed when
++             Flutter draws its first frame -->
++        <item name="android:windowBackground">@drawable/launch_background</item>
++    </style>
++    <!-- Theme applied to the Android Window as soon as the process has started.
++         This theme determines the color of the Android Window while your
++         Flutter UI initializes, as well as behind your Flutter UI while its
++         running.
++         
++         This Theme is only used starting with V2 of Flutter's Android embedding. -->
++    <style name="NormalTheme" parent="@android:style/Theme.Black.NoTitleBar">
++        <item name="android:windowBackground">?android:colorBackground</item>
++    </style>
++</resources>
+Index: flutter_app/android/app/src/main/res/drawable-v21/launch_background.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- flutter_app/android/app/src/main/res/drawable-v21/launch_background.xml	(date 1616184426751)
++++ flutter_app/android/app/src/main/res/drawable-v21/launch_background.xml	(date 1616184426751)
+@@ -0,0 +1,12 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!-- Modify this file to customize your launch splash screen -->
++<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
++    <item android:drawable="?android:colorBackground" />
++
++    <!-- You can insert your own image assets here -->
++    <!-- <item>
++        <bitmap
++            android:gravity="center"
++            android:src="@mipmap/launch_image" />
++    </item> -->
++</layer-list>
+Index: flutter_app/android/build.gradle
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- flutter_app/android/build.gradle	(date 1616184426735)
++++ flutter_app/android/build.gradle	(date 1616184426735)
+@@ -0,0 +1,31 @@
++buildscript {
++    ext.kotlin_version = '1.3.50'
++    repositories {
++        google()
++        jcenter()
++    }
++
++    dependencies {
++        classpath 'com.android.tools.build:gradle:4.1.0'
++        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
++    }
++}
++
++allprojects {
++    repositories {
++        google()
++        jcenter()
++    }
++}
++
++rootProject.buildDir = '../build'
++subprojects {
++    project.buildDir = "${rootProject.buildDir}/${project.name}"
++}
++subprojects {
++    project.evaluationDependsOn(':app')
++}
++
++task clean(type: Delete) {
++    delete rootProject.buildDir
++}
+Index: flutter_app/lib/model.dart
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- flutter_app/lib/model.dart	(revision 371377850d7fcd3ecbc00b5e47bb87cd196b6f9e)
++++ flutter_app/lib/model.dart	(date 1617862148068)
+@@ -1,0 +1,43 @@
++import 'package:flutter/material.dart';
++
++class Blog {
++  final int id;
++  final String title;
++  final String content;
++  final String category;
++  final String create_dt;
++  final int owner;
++
++  Blog(
++      {@required this.id,
++        @required this.title,
++        @required this.content,
++        @required this.category,
++        @required this.create_dt,
++        @required this.owner});
++
++  factory Blog.fromJson(Map<String, dynamic> json) {
++    return Blog(
++      id: json['id'],
++      title: json['title'],
++      content: json['content'],
++      category: json['category'],
++      create_dt: json['create_dt'],
++      owner: json['owner'],
++    );
++  }
++}
++
++class User {
++  final int id;
++  final String first_name;
++
++  User({@required this.id, @required this.first_name});
++
++  factory User.fromJson(Map<String, dynamic> json) {
++    return User(
++      id: json['id'],
++      first_name: json['first_name'],
++    );
++  }
++}
+Index: flutter_app/lib/home.dart
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- flutter_app/lib/home.dart	(revision 371377850d7fcd3ecbc00b5e47bb87cd196b6f9e)
++++ flutter_app/lib/home.dart	(date 1618498082806)
+@@ -1,0 +1,91 @@
++import 'package:flutter/material.dart';
++
++import 'all/allpost.dart';
++import 'domestic/domesticPost.dart';
++import 'foreign/ForeignPost.dart';
++import 'free/freePost.dart';
++import 'package:http/http.dart' as http;
++import 'dart:convert';
++import 'dart:async';
++import 'Navigatior/postTab.dart';
++
++int index = 0;
++
++class HomePage extends StatefulWidget {
++  @override
++  _HomePageState createState() => _HomePageState();
++}
++
++class _HomePageState extends State<HomePage>
++    with TickerProviderStateMixin, AutomaticKeepAliveClientMixin<HomePage> {
++
++  @override
++  bool get wantKeepAlive => true;
++  Widget page;
++
++
++  @override
++  Widget build(BuildContext context) {
++    super.build(context);
++    return Scaffold(
++        body: Navigator(
++          onGenerateRoute: (settings) {
++            page = Post(); //postTab의 Post()위젯
++            return MaterialPageRoute(builder: (_) => page);
++
++
++          },
++        ),
++
++        drawer: Drawer(
++          // 리스트뷰 추가
++          child: ListView(
++            padding: EdgeInsets.zero,
++            children: <Widget>[
++              // 드로워해더 추가
++              DrawerHeader(
++                child: Text('Drawer Header'),
++                decoration: BoxDecoration(
++                  color: Colors.blue,
++                ),
++              ),
++              // 리스트타일 추가
++              ListTile(
++                title: Text('게시판'),
++                onTap: (){
++                  // 네이게이터 팝을 통해 드로워를 닫는다.
++                  setState(() {
++                    page = Post();
++                    Navigator.pop(context);
++                  });
++                },
++              ),
++              // 리스트타일 추가
++              ListTile(
++                title: Text('종목저장소'),
++                onTap: (){
++                  // 드로워를 닫음
++                  Navigator.pop(context);
++                },
++              ),
++              ListTile(
++                title: Row(
++                  children: [
++                    Text('프로필'),
++                    Icon(Icons.home),
++                  ],
++                ),
++
++                onTap: (){
++                  // 드로워를 닫음
++                  Navigator.pop(context);
++                },
++              )
++            ],
++          ),
++        ),
++
++
++    );
++  }
++}
+Index: flutter_app/android/app/src/main/AndroidManifest.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- flutter_app/android/app/src/main/AndroidManifest.xml	(date 1617768537675)
++++ flutter_app/android/app/src/main/AndroidManifest.xml	(date 1617768537675)
+@@ -0,0 +1,46 @@
++<manifest xmlns:android="http://schemas.android.com/apk/res/android"
++    package="www.stockstorage.flutter_app">
++
++    <uses-permission android:name="android.permission.INTERNET" />
++    <application
++        android:icon="@mipmap/ic_launcher"
++        android:label="flutter_app"
++        android:usesCleartextTraffic="true">
++
++        <activity
++            android:name=".MainActivity"
++            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
++            android:hardwareAccelerated="true"
++            android:launchMode="singleTop"
++            android:theme="@style/LaunchTheme"
++            android:usesCleartextTraffic="true"
++            android:windowSoftInputMode="adjustResize">
++            <!-- Specifies an Android theme to apply to this Activity as soon as
++                 the Android process has started. This theme is visible to the user
++                 while the Flutter UI initializes. After that, this theme continues
++                 to determine the Window background behind the Flutter UI. -->
++            <meta-data
++                android:name="io.flutter.embedding.android.NormalTheme"
++                android:resource="@style/NormalTheme" />
++            <!-- Displays an Android View that continues showing the launch screen
++                 Drawable until Flutter paints its first frame, then this splash
++                 screen fades out. A splash screen is useful to avoid any visual
++                 gap between the end of Android's launch screen and the painting of
++                 Flutter's first frame. -->
++            <meta-data
++                android:name="io.flutter.embedding.android.SplashScreenDrawable"
++                android:resource="@drawable/launch_background" />
++            <intent-filter>
++                <action android:name="android.intent.action.MAIN" />
++                <category android:name="android.intent.category.LAUNCHER" />
++            </intent-filter>
++        </activity>
++        <!-- Don't delete the meta-data below.
++             This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
++        <meta-data
++            android:name="flutterEmbedding"
++            android:value="2" />
++
++    </application>
++
++</manifest>
+Index: flutter_app/android/app/src/main/res/drawable/launch_background.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- flutter_app/android/app/src/main/res/drawable/launch_background.xml	(date 1616184426751)
++++ flutter_app/android/app/src/main/res/drawable/launch_background.xml	(date 1616184426751)
+@@ -0,0 +1,12 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!-- Modify this file to customize your launch splash screen -->
++<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
++    <item android:drawable="@android:color/white" />
++
++    <!-- You can insert your own image assets here -->
++    <!-- <item>
++        <bitmap
++            android:gravity="center"
++            android:src="@mipmap/launch_image" />
++    </item> -->
++</layer-list>
+Index: flutter_app/lib/Navigatior/postTab.dart
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- flutter_app/lib/Navigatior/postTab.dart	(revision 371377850d7fcd3ecbc00b5e47bb87cd196b6f9e)
++++ flutter_app/lib/Navigatior/postTab.dart	(date 1618500831832)
+@@ -6,82 +6,103 @@
+ import 'package:http/http.dart' as http;
+ import 'dart:convert';
+ import 'dart:async';
++import 'package:back_button_interceptor/back_button_interceptor.dart';
+ 
+ class Post extends StatefulWidget {
+   @override
+   _PostState createState() => _PostState();
+ }
+ 
+-class _PostState extends State<Post>
+-    with TickerProviderStateMixin, AutomaticKeepAliveClientMixin<Post> {
++class _PostState extends State<Post> with TickerProviderStateMixin {
+   TabController tabController; //하단 탭바 컨트롤러
+ 
+-  @override
+-  bool get wantKeepAlive => true;
++  Widget all = AllPost();
++
++  bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
++    return true;
++  }
+ 
+   @override
+   void initState() {
+     super.initState();
+     tabController = TabController(length: 4, vsync: this);
++    BackButtonInterceptor.add(myInterceptor);
++  }
++
++  @override
++  void dispose() {
++    BackButtonInterceptor.remove(myInterceptor);
++    super.dispose();
+   }
+ 
+   @override
+   Widget build(BuildContext context) {
+-    super.build(context);
+-    return Scaffold(
+-      body: TabBarView(
+-        children: <Widget>[
+-          AllPost(),
+-          ForeignPost(),
+-          DomesticPost(),
+-          FreePost(),
+-        ],
+-        controller: tabController,
+-      ),
+-      appBar: AppBar(
+-        title:TabBar(
+-          tabs: <Tab>[
+-            Tab(
+-              child: Column(
+-                children: [
+-                  Text(
+-                    '최신글',
+-                    style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),
+-                  ),
+-                ],
+-              ),
+-            ),
+-            Tab(
+-              child: Column(
+-                children: [
+-                  Text(
+-                    '해외주식',
+-                    style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),
+-                  ),
+-                ],
+-              ),
+-            ),
+-            Tab(
+-              child: Column(
+-                children: [
+-                  Text(
+-                    '국내주식',
+-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+-                  ),
+-                ],
+-              ),
+-            ),
+-            Tab(child: Column(
+-              children: [
+-                Text(
+-                  '자유게시판',
+-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+-                ),
+-              ],
+-            ),
+-            ),
+-          ],
+-          controller: tabController,
++    final _libraryScreen = GlobalKey<NavigatorState>();
++    final _playlistScreen = GlobalKey<NavigatorState>();
++    final _searchScreen = GlobalKey<NavigatorState>();
++    final _bibleScreen = GlobalKey<NavigatorState>();
++
++    return WillPopScope( //뒤로가기 막기
++      child: Scaffold(
++        body: TabBarView(
++          children: <Widget>[
++            AllPost(),
++            ForeignPost(),
++            DomesticPost(),
++            FreePost(),
++          ],
++          controller: tabController,
++        ),
++        appBar: AppBar(
++          title: TabBar(
++            tabs: <Tab>[
++              Tab(
++                child: Column(
++                  children: [
++                    Text(
++                      '최신글',
++                      style: TextStyle(
++                          color: Colors.white, fontWeight: FontWeight.bold),
++                    ),
++                  ],
++                ),
++              ),
++              Tab(
++                child: Column(
++                  children: [
++                    Text(
++                      '해외주식',
++                      style: TextStyle(
++                          color: Colors.white, fontWeight: FontWeight.bold),
++                    ),
++                  ],
++                ),
++              ),
++              Tab(
++                child: Column(
++                  children: [
++                    Text(
++                      '국내주식',
++                      style: TextStyle(
++                          color: Colors.white, fontWeight: FontWeight.bold),
++                    ),
++                  ],
++                ),
++              ),
++              Tab(
++                child: Column(
++                  children: [
++                    Text(
++                      '자유게시판',
++                      style: TextStyle(
++                          color: Colors.white, fontWeight: FontWeight.bold),
++                    ),
++                  ],
++                ),
++              ),
++            ],
++            controller: tabController,
++          ),
+         ),
+       ),
+     );
+Index: flutter_app/android/app/src/profile/AndroidManifest.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- flutter_app/android/app/src/profile/AndroidManifest.xml	(date 1617765055732)
++++ flutter_app/android/app/src/profile/AndroidManifest.xml	(date 1617765055732)
+@@ -0,0 +1,7 @@
++<manifest xmlns:android="http://schemas.android.com/apk/res/android"
++    package="www.stockstorage.flutter_app">
++    <!-- Flutter needs it to communicate with the running application
++         to allow setting breakpoints, to provide hot reload, etc.
++    -->
++    <uses-permission android:name="android.permission.INTERNET"/>
++</manifest>
+Index: flutter_app/android/app/src/main/kotlin/www/stockstorage/flutter_app/MainActivity.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- flutter_app/android/app/src/main/kotlin/www/stockstorage/flutter_app/MainActivity.kt	(date 1617765055490)
++++ flutter_app/android/app/src/main/kotlin/www/stockstorage/flutter_app/MainActivity.kt	(date 1617765055490)
+@@ -0,0 +1,6 @@
++package www.stockstorage.flutter_app
++
++import io.flutter.embedding.android.FlutterActivity
++
++class MainActivity: FlutterActivity() {
++}
+Index: flutter_app/android/app/src/debug/AndroidManifest.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- flutter_app/android/app/src/debug/AndroidManifest.xml	(date 1617765055574)
++++ flutter_app/android/app/src/debug/AndroidManifest.xml	(date 1617765055574)
+@@ -0,0 +1,7 @@
++<manifest xmlns:android="http://schemas.android.com/apk/res/android"
++    package="www.stockstorage.flutter_app">
++    <!-- Flutter needs it to communicate with the running application
++         to allow setting breakpoints, to provide hot reload, etc.
++    -->
++    <uses-permission android:name="android.permission.INTERNET"/>
++</manifest>
+Index: flutter_app/android/app/build.gradle
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- flutter_app/android/app/build.gradle	(date 1617765055465)
++++ flutter_app/android/app/build.gradle	(date 1617765055465)
+@@ -0,0 +1,59 @@
++def localProperties = new Properties()
++def localPropertiesFile = rootProject.file('local.properties')
++if (localPropertiesFile.exists()) {
++    localPropertiesFile.withReader('UTF-8') { reader ->
++        localProperties.load(reader)
++    }
++}
++
++def flutterRoot = localProperties.getProperty('flutter.sdk')
++if (flutterRoot == null) {
++    throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
++}
++
++def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
++if (flutterVersionCode == null) {
++    flutterVersionCode = '1'
++}
++
++def flutterVersionName = localProperties.getProperty('flutter.versionName')
++if (flutterVersionName == null) {
++    flutterVersionName = '1.0'
++}
++
++apply plugin: 'com.android.application'
++apply plugin: 'kotlin-android'
++apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
++
++android {
++    compileSdkVersion 30
++
++    sourceSets {
++        main.java.srcDirs += 'src/main/kotlin'
++    }
++
++    defaultConfig {
++        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
++        applicationId "www.stockstorage.flutter_app"
++        minSdkVersion 16
++        targetSdkVersion 30
++        versionCode flutterVersionCode.toInteger()
++        versionName flutterVersionName
++    }
++
++    buildTypes {
++        release {
++            // TODO: Add your own signing config for the release build.
++            // Signing with the debug keys for now, so `flutter run --release` works.
++            signingConfig signingConfigs.debug
++        }
++    }
++}
++
++flutter {
++    source '../..'
++}
++
++dependencies {
++    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
++}
+diff --git flutter_app/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png flutter_app/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..4d6372eebdb28e45604e46eeda8dd24651419bc0
+GIT binary patch
+literal 1443
+zc$}@1{WsKk6vsdJTdFg%tJav9_E4vzrOaqkWF|A724Nly!y+?N9`Y<EGuRAcJfvb&
+zE7a!c9CbqSP?9ENJGEO%+hP?zkloFeFh~ipU+PcTdtRUSy`OvUFQ0qQ=LDDSsz)#;
+zAcXYX-JHE~uUS6pR^b|oUEG5^BZ-T@gdZ0sk%|*SkwZw_p-@xz7;$*0cc?fd`RKz?
+zIzrIT_4IMUn|<!j;((JBc!eM+1-}dCH{atK!^7u4m+&iiWP?Wz_@2kBhS5cMW@pQC
+z4>ET{JK1O_2U&6vg@-8Kh{{J)A7mv!yKwx_?f|qW80{4y8xf*KAbK>IIf9uJSh&M3
+zKd=r2>maZ`2z!LER|K|)!8Qc;g@Ii-*c|~{1kfX4e>Cim0ehTSu#W=<PCPIZz#$PF
+zB;a@q9FxE~8JttV1t%3)KZ0u-xXQsT9o#a&T><WyZ~#XM2eQCJ2_9Krp5uv=3!W#y
+zD;K<Q%>y>hNnoD>4$f)d<^#6?xGLZk08h0%A8(v9z{fcY{Bywn34G3h53WVvTeLhM
+z-(v7B0YNbcN>+xsJWq_m!FCBS>p;v#gxQ5)^dp#k6vm9j9FAg+iI~$d%sB~jkzuT4
+zjFp19rWhV6FpN-<Vv0!d7d9o986{O2C0{m5y=r{C&RBlkIK7dqXeMXgBr99US+~ep
+zt>o<6o3q<YPHH~y#q*bytwHHJe7i)6H=B?2O|4dp$$UCE@x{hYNb3+<W$*6n;3MlF
+z>sibHhG&p1c4pR=AENp<*jyLiOV`)uWme{@R%aAn5f|3>QIg)OSqt@HPpnoqzEFSY
+zihgymWMUptFG-V<bO~1LJ4X-fSbS4gX^=MiGRNfql8AZT@Q7=wY~g%G)8&q@84KFP
+z$*94~;XXC%*LrEe8R5uQ%l0|1$h6*?cMFkH^EqEi_q)!)>Nn@r>^`crtWn5f4ot+B
+zk4yQ#f1uGWF6=hUFVxbAwsWLyOQ#C8Bb4~b?KcQ??TAJE%&38ExP_|H){ta>x9m_&
+z)fmcNJ*BAL)evR>mIauO`I&2b7_H0>s&J@*(Zqa64IFBfS2CYb{Zwn0WEqXZYE$Z>
+zBqMuJZOTcjVRlXkR5tRf%%>AUD%bYz&7ash^o3U4TeFEo?c@L{erkZIoeC$#Pjf7X
+zM#_RT&&qz#bTfFGUPiE{uZ%MEwuO*8tNUu(%==U`z4meP>`X%Jh7m;>wSWFm-bX|K
+zMTe$4%BYTlkumk8Qa?!dE`xSqYH%YS?2pmCA6F_sor-!+KxSXgV+p#apcVw)u3~K^
+zYMO?obK7ee_Vf*!+M({M>iiuI9gmSf$He5%wTi-GamX4gi&?Fvub-IzVEDoHeT&3I
+z3z>ZB%2E(#qPG^A=}e4&8*O`R%X8AhuS7iU`|)7mbV--Uc4M2^b1pC0;7)7PsGE~V
+zdDC{fh{U`*G&43f|HhcJ#;)z&Dqb5J)~Vkc_u}AaRP?^%4YVE;b<tu0p`%(P={^(F
+zn^T*f-&tWl%81N+`^<7vT|je!>ywv%Z7&_@3Ivwp^ZZDMNA0qiuG0S7YvdND-)~FE
+z56k#RC}_Plr)fx$`}G*GtNgWt?ROH!E`54Zp^PW170vSdSM_3?9K(7De=N>;ZP-E!
+z&?%Ci<^*%<M9q<}A9z%AH~*~o7)YMi3uRO&UQahKC<%FwR<u)RTCvff9O-<=1Ohi5
+f`x2I5>#J_arz?Nc_isn|PeRDuh3$OJQKa|}9I$fT
+
+diff --git flutter_app/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png flutter_app/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..d5f1c8d34e7a88e3f88bea192c3a370d44689c3c
+GIT binary patch
+literal 1031
+zc%17D@N?(olHy`uVBq!ia0vp^6F``Q8Ax83A=Cw=BuiW)N`mv#O3D+9QW+dm@{>{(
+zJaZG%Q-e|yQz{EjrrIztFa`(sgt!6~Yi|1%a`XoT0ojZ}lNrNjb9xj&#3c(B0U1_%
+zz603|8tx3*z6?7440=Hf`oRqPAq)m#48}1G))@@;`HY6)jHdC7W(kbuNsLzMjMkZq
+zHrb3eIgGYIl*?$B$7o;3=vd6?Si<O3%II9d=u*Y#TFvNI!{}Da=vK$*UdQOs!06G)
+z=m|tkjGoPmo-K@C&5T|xj6Us*J{^p{K-9_T*UjkH!{`r0y^H~UjDh`(ffE=5Co%?3
+zVhozd7&Hmw{$L=Q!Wc4@F=QHJ=yb-=8H`~-G?OuG7GpRN&1N?X=CF?9bWG-S%jWVb
+z;_|ED4y@%4Y2*%T;SO)-j_l-)>f(;-;fd~1S#VQj;Z4;=cT|_$Q(gK%ZTUmB6_3?c
+zK2clwRBhEWwbelMTpfg707J<V97?l~PA~-qD}PClUoeA!fI~vVd=S`w{`~oM6EDAF
+zU|`bsba4!+xb^lzdT?-{Nb5rlE{-q}SEtPZJW^AHoLX934jk~c-q>J!BSYxN|M?z<
+zlUj=3-!+c;X2<vX@4mEok#_P<Y}X1s)-uagJZNMmiuh-I{-{`y&Aiu7eyUbHu&m~n
+zJ@Q1c`-Y8+;No_bq^|-lXXL^KcOQ3Ec~B_QSs~-%Bo{q##&NeLpJR3$dvvjD%e>V`
+znZ^3uQXXpxxi0@YN8n~v#-hvBvt0P(x=wKWH=nrpSnt!ZVD+MpJ39A#`XjuvYL4r@
+z%70xPa_SSO&+F=VvQfP9wPt6Bob|-(a=B6caVjq_cBa^>yIz`?HgV7Lz?7!taVc%j
+zBT~ASs~H^+7M=M-vpd3O-)R^B!u^+zUlyJ9{QUNS)t-y?uD^WxrCG5{b^NmUrNyTt
+zF1~wy(nV|e6wO6*{m+Z9%{eD=@!Ro)64PMTnF_al2~_M%O5Jpm%Ombfb+V3(f7DAU
+zkEk!%wH6|=tJqI=)$OYnnbWOn-k{=YfA4GmS(ha5lUqxkNvNp*`giSrg^ft3+A4*@
+zi_d2NW?t-{u5|Io>(JHz6cqy%>o=EYl+<LEEoAXZ4RvN(<n-^@+<olIjVEvZJQ5}B
+z?iBLr&Z~FQGJHNqgS^ByuXywF)i?VZ!SJ$;U0U;Q+a^90S-j%SPV+>~={H<j|J+sg
+zbnWoI@-Ihq@f6QRVT;=RuPjq&;!x@U5{o{oI6YsfJnsu{!p!~Go&!@AgQu&X%Q~lo
+FCIBHis+j-)
+
+diff --git flutter_app/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png flutter_app/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..09d4391482be68e9e4a07fab769b5de337d16eb1
+GIT binary patch
+literal 721
+zc%17D@N?(olHy`uVBq!ia0vp^2_VeD3?#3*wSy!iOI#yLg7ec#$`gxH85~pclTsBt
+za}(23gHjVyDhp4h+5i=O3-AeX1=1l$e`s#|#^}+&7(N@w0CIr{$Oe+Uk^K-ZP~83C
+zcc@hG6rikF&NPT(23>y!y&wkt5C($~2D>~)O*cj@FGjOCM)M>_ixfudOh)?xMu#Fs
+z#}Y=@YDTwOM)x{K_j*Q;dPdJ?Mz0n|pLRx{4n|)f>SXlmV)XB04CrSJn#dS5nK5`W
+z$gYs7jG@yR!)7ps&14Ll#TX7mvzd$|n5<Hn?DLqM%b47&nLX>6y&9Rlo5V8u#j~eK
+z6wQ;YST0q&PO5RUbn`ap)*aGqyJWi#03GbIALNU|4Qm$weJ)lK<QL2!pkM$50SO5O
+z1r77(&p-bj1a`Be3NkP-`g^)KhGg7(d-J;AVF!WMhYlJGzh_nDGx{VoJzknDl=a|m
+zJlkoPY1i*{rew2mT0F1%T0iTxuE>V_yY|iWFJgYNxZmy<GV%ZZFXzKgep&uX{<8by
+zy8XA`vuyZc&EZoUl<-=ZDfzy}hHtz~#rCQhe*@d<oG$!QUd!LMPfg{QuGfhx{hTZ9
+z6jR=~H!aK;G5UVHX=A=X(HG~&7t32>{yHf9=2T3NpMUQ<%fvb#fmiNL5&LyHzBxN?
+zk>}9)`z}+cLO$hZ*Ndes+u4_^XzsZeZlkKP=g!=n^Ck(;%YPeX%dn(n`E23mN-QZY
+z&%QRkt%+AqGFi9n6yt+yQ+qyC?A%wK60Y13{b72TSvjA-wyD1+=fUmI!pygw4h=tg
+zOykG3H-~Qh+v(Ng`(f?RqsgfflMS}+d9L}nqU90G)#pN0YN9M00(CwIZhT`+Y-cOm
+TJ-3|?82AjHu6{1-oD!M<cl<5t
+
+diff --git flutter_app/android/app/src/main/res/mipmap-mdpi/ic_launcher.png flutter_app/android/app/src/main/res/mipmap-mdpi/ic_launcher.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..17987b79bb8a35cc66c3c1fd44f5a5526c1b78be
+GIT binary patch
+literal 442
+zc%17D@N?(olHy`uVBq!ia0vp^1|ZDA3?vioaBc-sk|nMYCBgY=CFO}lsSJ)O`AMk?
+zp1FzXsX?iUDV2pMQ*D5Xx&nMcT!A!W`0S9QKQy;}1Cl^CgaH?UAfPyVct3=};#>rj
+z3OoW5XRyg;bSh=^?PB!nW(=9i7&479bUI_$OvbQTjNw2un_1VJ*)WjRDUa2+fi1XG
+zu5*`s?*YZBr<G=1QkruWXpZ4ds8NCb{j5OOh?WHT1v3Z;C@2^h81&DdzkdJu^XK1#
+zK>ntFVW5Jgo-U3d9>?EaIVsd+AmDnjgZbQ|rlv(}mH0aT|F7ojyqm)_x0O4%^7NIR
+zS9fzHe*g2qZ+68w>-T^1Ys)>PE57cFujH(~%h<PG%*LPfdOg?6>g}7Zop$=U=)j}h
+z^`b8}UZ_-zdJ?+ud(o-=+{*uTp7GqD6IdW?E-}B1z5BGG>`am8Iyajf3$2c<=KauJ
+yvp-@T;|<q+-H${X;(de<Z0ssy2otH_#D05X*sUWmCzk^q%;4$j=d#Wzp$P!uPrJzg
+
+diff --git flutter_app/android/app/src/main/res/mipmap-hdpi/ic_launcher.png flutter_app/android/app/src/main/res/mipmap-hdpi/ic_launcher.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..db77bb4b7b0906d62b1847e87f15cdcacf6a4f29
+GIT binary patch
+literal 544
+zc%17D@N?(olHy`uVBq!ia0vp^9w5xY3?!3`olAj~WQl7;NpOBzNqJ&XDuZK6ep0G}
+zXKrG8YEWuoN@d~6R2!h8bpbvhu0Wd6uZuB!w&u2PAxD2eNXD>P5D~Wn-+^4P$V{M!
+zMA=e^0^4<u8H^$sEK(S?y%`OH8SU~I?eZDj>lr<p7=7A72Ksd~`t>jdPGk(4#27T0
+zF?b4N=yb-=8H`~wz=ng&XR=ObawuSOE@Sd+VD@ce_U~d2=oZVEAf7){vSOK3-3ICA
+zZPIPKWZL%tEp^!sa>?6;Qno-B3zr1>1v3Z$K|nwP2sE4rf%}pIPksTVUwXPYhD02G
+zd*(V{lY@XmV91-j3GcglWVL_&w@+)~;PzHJw~qhV&h_S&T~3}pYw!L1^kjlFpCy=h
+zKPRM7zqR0#;^tL#mpNMv{ARQiS8%>&QQh-+dW`z_ork^FP2QR}-+JB=3o&)qg1AZN
+zIlU&zxN}+5X)gLa#iD(xlC{sg$DWJMc?*@xc(#3>V&He_(P~8*)xd{yUfZobF+tB-
+z)<|f{=d!d0mX}*3Uvmpg?|XglN*l}4!<&rfoXPR<Fq-|=uYL_Phu5;O{IAQ{8WyBv
+y^}dt2Q4myV+LWN78OAa}`KY(b-&J4M+cNa3D6?4S?K}YVG=rzBpUXO@geCwmqt#IW
+
