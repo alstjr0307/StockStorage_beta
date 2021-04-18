@@ -85,6 +85,7 @@ class _allDetailState extends State<allDetail> {
             return Scaffold(
               appBar: AppBar(
                 title: Text(content['title']),
+                centerTitle: true,
               ),
               //목록으로 버튼
               floatingActionButton: FloatingActionButton(

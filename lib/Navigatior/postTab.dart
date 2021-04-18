@@ -14,6 +14,7 @@ class Post extends StatefulWidget {
 }
 
 class _PostState extends State<Post> with TickerProviderStateMixin {
+  int _selectedIndex = 0;
   TabController tabController; //하단 탭바 컨트롤러
 
   Widget all = AllPost();
@@ -34,75 +35,50 @@ class _PostState extends State<Post> with TickerProviderStateMixin {
     BackButtonInterceptor.remove(myInterceptor);
     super.dispose();
   }
-
+  List _widgetOptions = [
+    AllPost(),
+    ForeignPost(),
+    DomesticPost(),
+    FreePost(),
+  ];
   @override
   Widget build(BuildContext context) {
-    final _libraryScreen = GlobalKey<NavigatorState>();
-    final _playlistScreen = GlobalKey<NavigatorState>();
-    final _searchScreen = GlobalKey<NavigatorState>();
-    final _bibleScreen = GlobalKey<NavigatorState>();
-
-    return WillPopScope( //뒤로가기 막기
+    return WillPopScope(
+      //뒤로가기 막기
       child: Scaffold(
-        body: TabBarView(
-          children: <Widget>[
-            AllPost(),
-            ForeignPost(),
-            DomesticPost(),
-            FreePost(),
+        body: _widgetOptions.elementAt(_selectedIndex),
+        bottomNavigationBar: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: Colors.grey,
+          selectedItemColor: Colors.white,
+          unselectedItemColor: Colors.white.withOpacity(.60),
+          selectedFontSize: 14,
+          unselectedFontSize: 14,
+          currentIndex: _selectedIndex,
+          //현재 선택된 Index
+          onTap: (int index) {
+            setState(() {
+              _selectedIndex = index;
+            });
+          },
+          items: [
+            BottomNavigationBarItem(
+              title: Text('최신'),
+              icon: Icon(Icons.list),
+            ),
+            BottomNavigationBarItem(
+              title: Text('해외주식'),
+              icon: Icon(Icons.attach_money),
+            ),
+            BottomNavigationBarItem(
+              title: Text('국내주식'),
+              icon: Icon(Icons.assessment ),
+            ),
+            BottomNavigationBarItem(
+              title: Text('자유게시판'),
+              icon: Icon(Icons.library_books),
+            ),
           ],
-          controller: tabController,
-        ),
-        appBar: AppBar(
-          title: TabBar(
-            tabs: <Tab>[
-              Tab(
-                child: Column(
-                  children: [
-                    Text(
-                      '최신글',
-                      style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-              Tab(
-                child: Column(
-                  children: [
-                    Text(
-                      '해외주식',
-                      style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-              Tab(
-                child: Column(
-                  children: [
-                    Text(
-                      '국내주식',
-                      style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-              Tab(
-                child: Column(
-                  children: [
-                    Text(
-                      '자유게시판',
-                      style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-            controller: tabController,
-          ),
         ),
       ),
     );

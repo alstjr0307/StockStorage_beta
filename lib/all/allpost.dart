@@ -6,7 +6,7 @@ import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'allDetail.dart';
 import 'package:flutter_app/Navigatior/postTab.dart';
 import 'package:dio/dio.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 
 class AllPost extends StatefulWidget {
@@ -21,14 +21,15 @@ class _AllPostState extends State<AllPost>
   bool isLoading = false;
   List posts = [];
   final dio = new Dio();
-
+  int maxpage;
 
   @override
   void initState() {
+
     this._getMoreData(page);
     super.initState();
     _sc.addListener(() {
-      if (_sc.position.pixels == _sc.position.maxScrollExtent) {
+      if (_sc.position.pixels == _sc.position.maxScrollExtent && page<maxpage) {
         this._getMoreData(page);
       }
     });
@@ -48,6 +49,8 @@ class _AllPostState extends State<AllPost>
 
   void _getMoreData(int index) async {
     List tList = [];
+    var sharedPreferences = await SharedPreferences.getInstance();
+    var token = sharedPreferences.getString("token");
     print('1');
     if (!isLoading) {
       print(isLoading);
@@ -59,7 +62,10 @@ class _AllPostState extends State<AllPost>
       var url = "http://13.125.62.90/api/v1/BlogPosts/?page=" +
           (index+1).toString();
       print(url);
-      final response = await dio.get(url);
+      final response = await dio.get(url, options: Options(
+          headers: {"Authorization" : "Token ${token}"}
+      ));
+      maxpage= response.data['count'] ~/ 10 +1;
       print('1');
       tList = [];
       for (int i = 0; i < response.data['results'].length; i++) {
@@ -76,37 +82,46 @@ class _AllPostState extends State<AllPost>
       print(page);
     }
   }
-
+  Future<void> _getData() async {
+    setState(() {
+      page=0;
+      posts=[];
+      _getMoreData(page);
+    });
+  }
   Widget _buildList() {
     print('13');
 
-    return ListView.builder(
-        itemCount: posts.length + 1,
-        controller: _sc,
-        // Add one more item for progress indicator
-        padding: EdgeInsets.symmetric(vertical: 8.0),
-        itemBuilder: (BuildContext context, int index) {
-          print('ㄱㄱ ${posts.length}');
-          print('index${index}');
-          if (index == posts.length) {
-            return _buildProgressIndicator();
-          } else {
-            return new ListTile(
-              onTap: (){Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        allDetail(index: posts[index]["id"])));},
+    return RefreshIndicator(
+      child: ListView.builder(
+          itemCount: posts.length + 1,
+          controller: _sc,
+          // Add one more item for progress indicator
+          padding: EdgeInsets.symmetric(vertical: 8.0),
+          itemBuilder: (BuildContext context, int index) {
+            print('ㄱㄱ ${posts.length}');
+            print('index${index}');
+            if (index == posts.length) {
+              return _buildProgressIndicator();
+            } else {
+              return new ListTile(
+                onTap: (){Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          allDetail(index: posts[index]["id"])));},
 
-                title: Text((posts[index]['title'])),
-                subtitle: Text((posts[index]['owner'].toString())),
+                  title: Text((posts[index]['title'])),
+                  subtitle: Text((posts[index]['owner'].toString())),
 
 
-            );
+              );
 
-            return Container();
-          }
-        });
+              return Container();
+            }
+          }),
+      onRefresh: _getData,
+    );
   }
 
   Widget _buildProgressIndicator() {
@@ -133,12 +148,9 @@ class _AllPostState extends State<AllPost>
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.refresh),
-        onPressed: (){
-          super.initState();
-        },
-      ),
+
+
+
       body:
       _buildList(),
 
