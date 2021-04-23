@@ -13,7 +13,25 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool _isLoading = false;
-  String msg = '';
+  String msg = '.';
+
+  Widget errormsg = Container();
+  @override
+  void initstate() {
+    errormsg = Card(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          ListTile(
+            leading: Icon(Icons.album, size: 50),
+            title:  Text(msg),
+            subtitle: Text('TWICE'),
+          ),
+        ],
+      ),
+    );
+
+  }
   @override
   Widget build(BuildContext context) {
     print('1');
@@ -57,7 +75,9 @@ class _LoginPageState extends State<LoginPage> {
       print('1');
       jsonData = json.decode(response.body);
       var token = jsonData['auth_token'];
-      var userresponse = await http.get(Uri.http("13.125.62.90", "api/v2/auth/users/me"), headers: {"Authorization" : "Token ${token}"});
+      var userresponse = await http.get(
+          Uri.http("13.125.62.90", "api/v2/auth/users/me"),
+          headers: {"Authorization": "Token ${token}"});
       var user = jsonDecode(utf8.decode(userresponse.bodyBytes));
       setState(() {
         _isLoading = false;
@@ -71,12 +91,24 @@ class _LoginPageState extends State<LoginPage> {
     if (response.statusCode == 400) {
       setState(() {
         _isLoading = false;
-        msg='잘못된 로그인 정보';
+        errormsg =
+          Card(
+            color: Colors.red,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+
+              children: <Widget>[
+                ListTile(
+                  leading: Icon(Icons.error, size: 50),
+                  title: Text('아이디나 비밀번호가 잘못됐습니다', style: TextStyle(color: Colors.white),),
+
+                ),
+              ],
+            ),
+          );
+
       });
-
-    }
-      else
-
+    } else
       print(response.body);
   }
 
@@ -97,7 +129,7 @@ class _LoginPageState extends State<LoginPage> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(5.0),
           ),
-          child: Text("회원가입", style: TextStyle(color: Colors.white70)),
+          child: Text("로그인", style: TextStyle(color: Colors.white70)),
         ));
   }
 
@@ -106,17 +138,17 @@ class _LoginPageState extends State<LoginPage> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 20.0),
       margin: EdgeInsets.only(top: 30.0),
-      child: Column(
-        children: <Widget>[
-          txtUsername('Username', Icons.email),
-          SizedBox(height: 30.0),
-          txtPassword("Password", Icons.lock),
-          SizedBox(height:30.0),
-          Text(msg),
-        ],
-      ),
+      child: Column(children: <Widget>[
+        txtUsername('Username', Icons.email),
+        SizedBox(height: 30.0),
+        txtPassword("Password", Icons.lock),
+        SizedBox(height: 30.0),
+        errormsg,
+      ]),
     );
   }
+
+
 
   TextFormField txtUsername(String title, IconData icon) {
     print('5');

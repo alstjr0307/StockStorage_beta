@@ -10,6 +10,9 @@ import 'dart:async';
 import 'Navigatior/postTab.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'loginpage.dart';
+import 'Navigatior/Storage/storage.dart';
+import 'package:foldable_sidebar/foldable_sidebar.dart';
+
 
 int index = 0;
 
@@ -20,14 +23,14 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage>
     with TickerProviderStateMixin, AutomaticKeepAliveClientMixin<HomePage> {
+  String title = '게시판';
   SharedPreferences sharedPreferences;
   var username = '';
+
   @override
   void initState() {
-
     super.initState();
     checkLoginStatus();
-
   }
 
   checkLoginStatus() async {
@@ -38,11 +41,9 @@ class _HomePageState extends State<HomePage>
           (Route<dynamic> route) => false);
     }
     print(sharedPreferences.getString("token"));
-    
-    username= sharedPreferences.getString("nickname");
 
+    username = sharedPreferences.getString("nickname");
   }
-
 
   @override
   bool get wantKeepAlive => true;
@@ -50,69 +51,110 @@ class _HomePageState extends State<HomePage>
 
   @override
   Widget build(BuildContext context) {
+    FSBStatus drawerStatus;
     super.build(context);
-    return Scaffold(
-      appBar: AppBar(
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
           backgroundColor: Colors.grey,
-          title: Text("Code Land", style: TextStyle(color: Colors.white)),
-          actions: <Widget>[
-            FlatButton(
-              onPressed: () {
-                sharedPreferences.clear();
-                sharedPreferences.commit();
-                Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(
-                        builder: (BuildContext context) => LoginPage()),
-                    (Route<dynamic> route) => false);
-              },
-              child: Text("Log out", style: TextStyle(color: Colors.white)),
-            )
-          ]),
-      body: page,
-      drawer: Drawer(
-        // 리스트뷰 추가
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            // 드로워해더 추가
-            DrawerHeader(
-              child: Text(username),
-              decoration: BoxDecoration(
-                color: Colors.blue,
+          toolbarHeight: 40,
+          title: Text(title, style: TextStyle(color: Colors.white)),
+        ),
+        body:page,
+      
+        drawer: Drawer(
+          // 리스트뷰 추가
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: <Widget>[
+              // 드로워해더 추가
+              DrawerHeader(
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(username),
+                      SizedBox(height: 50,),
+                      TextButton(
+                        onPressed: () {
+                          sharedPreferences.clear();
+                          sharedPreferences.commit();
+                          Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                  builder: (BuildContext context) => LoginPage()),
+                              (Route<dynamic> route) => false);
+                        },
+
+                        child: Container(
+                          padding: EdgeInsets.fromLTRB(10,2,10,2),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.rectangle,
+                            color: Colors.blueAccent,
+                            border: Border.all(width: 1.0, color: Colors.white),
+                            borderRadius: BorderRadius.all(
+                                Radius.circular(30.0)),
+                          ),
+
+                          child: Align(
+                              alignment: Alignment.bottomCenter,
+                              child: Text(
+                                "로그아웃",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                ),
+                              ),
+                            ),
+                          ),
+
+                        ),
+
+                    ],
+                  ),
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.blue,
+                ),
               ),
-            ),
-            // 리스트타일 추가
-            ListTile(
-              title: Text('게시판'),
-              onTap: () {
-                // 네이게이터 팝을 통해 드로워를 닫는다.
-                setState(() {
-                  page = Post();
+              // 리스트타일 추가
+              ListTile(
+                title: Text('게시판'),
+                onTap: () {
+                  // 네이게이터 팝을 통해 드로워를 닫는다.
+                  setState(() {
+                    page = Post();
+                    title = '게시판';
+                    Navigator.pop(context);
+                  });
+                },
+              ),
+              // 리스트타일 추가
+              ListTile(
+                title: Text('종목저장소'),
+                onTap: () {
+                  // 드로워를 닫음
+                  setState(() {
+                    page = Storage();
+                    title = '종목저장소';
+                  });
                   Navigator.pop(context);
-                });
-              },
-            ),
-            // 리스트타일 추가
-            ListTile(
-              title: Text('종목저장소'),
-              onTap: () {
-                // 드로워를 닫음
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: Row(
-                children: [
-                  Text('프로필'),
-                  Icon(Icons.home),
-                ],
+                },
               ),
-              onTap: () {
-                // 드로워를 닫음
-                Navigator.pop(context);
-              },
-            )
-          ],
+              ListTile(
+                title: Row(
+                  children: [
+                    Text('프로필'),
+                    Icon(Icons.home),
+                  ],
+                ),
+                onTap: () {
+                  // 드로워를 닫음
+                  Navigator.pop(context);
+                },
+              )
+            ],
+          ),
         ),
       ),
     );
