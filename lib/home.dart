@@ -11,7 +11,7 @@ import 'Navigatior/postTab.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'loginpage.dart';
 import 'Navigatior/Storage/storage.dart';
-import 'package:foldable_sidebar/foldable_sidebar.dart';
+
 
 
 int index = 0;
@@ -51,7 +51,6 @@ class _HomePageState extends State<HomePage>
 
   @override
   Widget build(BuildContext context) {
-    FSBStatus drawerStatus;
     super.build(context);
     return SafeArea(
       child: Scaffold(

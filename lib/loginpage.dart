@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'realhome.dart';
 class LoginPage extends StatefulWidget {
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -83,8 +83,10 @@ class _LoginPageState extends State<LoginPage> {
         _isLoading = false;
         sharedPreferences.setString("token", jsonData['auth_token']);
         sharedPreferences.setString("nickname", user['first_name']);
+        sharedPreferences.setInt('userID', user['id']);
+
         Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (BuildContext context) => HomePage()),
+            MaterialPageRoute(builder: (BuildContext context) => RealHome()),
             (Route<dynamic> route) => false);
       });
     }

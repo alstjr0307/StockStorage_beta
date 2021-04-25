@@ -36,7 +36,8 @@ dependencies:
   shared_preferences: ^0.5.12
   intl: ^0.17.0
   salomon_bottom_bar: ^3.0.0
-  foldable_sidebar: ^1.0.0
+  beauty_textfield: ^0.0.1
+  fluent_appbar: ^1.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

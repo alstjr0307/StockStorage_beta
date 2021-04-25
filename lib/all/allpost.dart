@@ -9,7 +9,7 @@ import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-
+import 'addPost.dart';
 class AllPost extends StatefulWidget {
   @override
   _AllPostState createState() => _AllPostState();
@@ -17,7 +17,9 @@ class AllPost extends StatefulWidget {
 
 class _AllPostState extends State<AllPost>
     with AutomaticKeepAliveClientMixin<AllPost> {
+
   ScrollController _sc = new ScrollController();
+
   static int page = 0;
   bool isLoading = false;
   List posts = [];
@@ -27,12 +29,12 @@ class _AllPostState extends State<AllPost>
 
   @override
   void initState() {
-    this._getMoreData(page);
+    _getMoreData(page);
     super.initState();
     _sc.addListener(() {
       if (_sc.position.pixels == _sc.position.maxScrollExtent &&
           page < maxpage) {
-        this._getMoreData(page);
+        _getMoreData(page);
       }
     });
     print('이닛');
@@ -100,105 +102,107 @@ class _AllPostState extends State<AllPost>
   }
 
   Widget _buildList() {
-    return RefreshIndicator(
-      child: ListView.builder(
-          itemCount: posts.length + 1,
-          controller: _sc,
-          // Add one more item for progress indicator
-          padding: EdgeInsets.symmetric(vertical: 8.0),
-          itemBuilder: (BuildContext context, int index) {
-            print('index${index}');
-            if (index == posts.length) {
-              return _buildProgressIndicator();
-            } else {
-              return Container(
-                margin: new EdgeInsets.fromLTRB(5, 0, 5, 0),
-                width: 25.0,
-                height: 80.0,
-                child: InkWell(
-                  child: Card(
-                    margin: EdgeInsets.symmetric(vertical: 2, horizontal: 0),
-                    color: Colors.white70,
-                    elevation: 5,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(10.0,0,8.0,0),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(),
-                                Text(
-                                  (posts[index]['title']),
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Row(
-                                        children: [
-                                          Icon(Icons.person, size:15),
-                                          Text(
-                                            (posts[index]['writer'].toString()), style: TextStyle(fontSize: 12),
-                                          ),
-                                          SizedBox(width:10),
-                                          Icon(Icons.comment, size: 15, color: Colors.redAccent,),
-                                          Text(
-                                             ' ${posts[index]['comment'].toString()}', style: TextStyle(fontSize:12,color: Colors.red)),
-
-                                          SizedBox(width:10),
-                                          Icon(Icons.thumb_up, size:15, color: Colors.red,),
-                                          Text(' ${posts[index]['likes'].toString()}', style: TextStyle(fontSize :12, color: Colors.red))
-
-                                        ],
-                                      ),
+    return Container(
+      child: RefreshIndicator(
+        child: ListView.builder(
+            itemCount: posts.length + 1,
+            controller: _sc,
+            // Add one more item for progress indicator
+            padding: EdgeInsets.symmetric(vertical: 8.0),
+            itemBuilder: (BuildContext context, int index) {
+              print('index${index}');
+              if (index == posts.length) {
+                return _buildProgressIndicator();
+              } else {
+                return Container(
+                  margin: new EdgeInsets.fromLTRB(5, 0, 5, 0),
+                  width: 25.0,
+                  height: 80.0,
+                  child: InkWell(
+                    child: Card(
+                      margin: EdgeInsets.symmetric(vertical: 2, horizontal: 0),
+                      color: Colors.white70,
+                      elevation: 5,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(10.0,0,8.0,0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(),
+                                  Text(
+                                    (posts[index]['title']),
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
                                     ),
-                                    Row(
-                                      children: [
-                                        Icon(Icons.timer, size: 12,color: Colors.grey),
-                                        Text(posts[index]['time'],style: TextStyle(fontSize: 12, color: Colors.grey)),
-                                      ],
-                                    )
-                                  ],
-                                ),
-                              ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Row(
+                                          children: [
+                                            Icon(Icons.person, size:15),
+                                            Text(
+                                              (posts[index]['writer'].toString()), style: TextStyle(fontSize: 12),
+                                            ),
+                                            SizedBox(width:10),
+                                            Icon(Icons.comment, size: 15, color: Colors.redAccent,),
+                                            Text(
+                                               ' ${posts[index]['comment'].toString()}', style: TextStyle(fontSize:12,color: Colors.red)),
+
+                                            SizedBox(width:10),
+                                            Icon(Icons.thumb_up, size:15, color: Colors.red,),
+                                            Text(' ${posts[index]['likes'].toString()}', style: TextStyle(fontSize :12, color: Colors.red))
+
+                                          ],
+                                        ),
+                                      ),
+                                      Row(
+                                        children: [
+                                          Icon(Icons.timer, size: 12,color: Colors.grey),
+                                          Text(posts[index]['time'],style: TextStyle(fontSize: 12, color: Colors.grey)),
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                        Container(
-                          margin: const EdgeInsets.all(4.0),
-                          padding: const EdgeInsets.all(10.0),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.blueAccent,
-                            border: Border.all(width: 1.0, color: Colors.white),
-                          ),
-                          child: Text(posts[index]['type'],
-                              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                        )
-                      ],
-                    ),
-                  ),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => allDetail(
-                          index: posts[index]["id"],
-                        ),
+                          Container(
+                            margin: const EdgeInsets.all(4.0),
+                            padding: const EdgeInsets.all(10.0),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.blueAccent,
+                              border: Border.all(width: 1.0, color: Colors.white),
+                            ),
+                            child: Text(posts[index]['type'],
+                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                          )
+                        ],
                       ),
-                    );
-                  },
-                ),
-              );
-            }
-          }),
-      onRefresh: _getData,
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => allDetail(
+                            index: posts[index]["id"],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              }
+            }),
+        onRefresh: _getData,
+      ),
     );
   }
 
@@ -223,8 +227,25 @@ class _AllPostState extends State<AllPost>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+
     return Scaffold(
+      appBar: AppBar(
+        title: Text('전체'),
+        actions: [
+          IconButton(icon: Icon(Icons.add), onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>AddPost()
+              )
+            );
+
+          })
+        ],
+      ),
+
       body: _buildList(),
     );
   }
+
 }
