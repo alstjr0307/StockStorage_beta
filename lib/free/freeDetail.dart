@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_html/style.dart';
+
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';

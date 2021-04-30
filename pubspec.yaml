@@ -22,22 +22,28 @@ environment:
 
 dependencies:
   flutter:
-
     sdk: flutter
+
   http: ^0.13.1
-  flutter_html: ^1.3.0
+  flutter_html: ^0.10.4
   back_button_interceptor: ^5.0.0
-  provider: ^4.3.2
+  provider: ^5.0.0
   dio: ^4.0.0
   json_table: ^2.0.1
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
-  shared_preferences: ^0.5.12
+  shared_preferences: ^2.0.5
   intl: ^0.17.0
   salomon_bottom_bar: ^3.0.0
   beauty_textfield: ^0.0.1
   fluent_appbar: ^1.0.0
+  flex_color_scheme: ^2.1.1
+  google_mobile_ads: ^0.12.1+1
+  html_editor_enhanced: ^2.0.0+1
+  searchable_dropdown: ^1.1.3
+
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -48,7 +54,9 @@ dev_dependencies:
 # The following section is specific to Flutter.
 flutter:
   assets:
-    - KStock.json
+    - assets/KStock.json
+    - assets/photos/example.PNG
+
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -70,8 +78,14 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
+  fonts:
+    - family: gyeongi
+      fonts:
+        - asset: assets/fonts/gyeongibold.ttf
+    - family: Hoon
+      fonts:
+        - asset: assets/fonts/HoonWhitecatR.ttf
+          weight: 700
   #     fonts:
   #       - asset: fonts/Schyler-Regular.ttf
   #       - asset: fonts/Schyler-Italic.ttf

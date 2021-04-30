@@ -1,11 +1,13 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_app/profile/signup.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'home.dart';
+import '../home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'realhome.dart';
+import '../realhome.dart';
+
 class LoginPage extends StatefulWidget {
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -16,22 +18,7 @@ class _LoginPageState extends State<LoginPage> {
   String msg = '.';
 
   Widget errormsg = Container();
-  @override
-  void initstate() {
-    errormsg = Card(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          ListTile(
-            leading: Icon(Icons.album, size: 50),
-            title:  Text(msg),
-            subtitle: Text('TWICE'),
-          ),
-        ],
-      ),
-    );
 
-  }
   @override
   Widget build(BuildContext context) {
     print('1');
@@ -52,6 +39,8 @@ class _LoginPageState extends State<LoginPage> {
                     headerSection(),
                     textSection(),
                     buttonSection(),
+                    signupSection(),
+                    goHome(),
                   ],
                 )),
     );
@@ -93,22 +82,21 @@ class _LoginPageState extends State<LoginPage> {
     if (response.statusCode == 400) {
       setState(() {
         _isLoading = false;
-        errormsg =
-          Card(
-            color: Colors.red,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-
-              children: <Widget>[
-                ListTile(
-                  leading: Icon(Icons.error, size: 50),
-                  title: Text('아이디나 비밀번호가 잘못됐습니다', style: TextStyle(color: Colors.white),),
-
+        errormsg = Card(
+          color: Colors.red,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              ListTile(
+                leading: Icon(Icons.error, size: 50),
+                title: Text(
+                  '아이디나 비밀번호가 잘못됐습니다',
+                  style: TextStyle(color: Colors.white),
                 ),
-              ],
-            ),
-          );
-
+              ),
+            ],
+          ),
+        );
       });
     } else
       print(response.body);
@@ -135,13 +123,43 @@ class _LoginPageState extends State<LoginPage> {
         ));
   }
 
+  Container goHome() {
+    return Container(
+      child: TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: Text('비회원으로 계속하기')),
+    );
+  }
+
+  Container signupSection() {
+    return Container(
+        width: MediaQuery.of(context).size.width,
+        height: 40.0,
+        margin: EdgeInsets.only(top: 30.0),
+        padding: EdgeInsets.symmetric(horizontal: 20.0),
+        child: RaisedButton(
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (BuildContext context) => SignUp()),
+            );
+          },
+          color: Colors.purple,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(5.0),
+          ),
+          child: Text("회원가입", style: TextStyle(color: Colors.white70)),
+        ));
+  }
+
   Container textSection() {
     print('4');
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 20.0),
       margin: EdgeInsets.only(top: 30.0),
       child: Column(children: <Widget>[
-        txtUsername('Username', Icons.email),
+        txtUsername('Username', Icons.person_outline),
         SizedBox(height: 30.0),
         txtPassword("Password", Icons.lock),
         SizedBox(height: 30.0),
@@ -149,8 +167,6 @@ class _LoginPageState extends State<LoginPage> {
       ]),
     );
   }
-
-
 
   TextFormField txtUsername(String title, IconData icon) {
     print('5');
@@ -168,6 +184,7 @@ class _LoginPageState extends State<LoginPage> {
   TextFormField txtPassword(String title, IconData icon) {
     print('6');
     return TextFormField(
+      obscureText: true,
       controller: passwordController,
       style: TextStyle(color: Colors.white70),
       decoration: InputDecoration(
@@ -182,7 +199,7 @@ class _LoginPageState extends State<LoginPage> {
     print('3');
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 30.0),
-      child: Text('Code Land', style: TextStyle(color: Colors.white)),
+      child: Text('주식저장소 로그인', style: TextStyle(color: Colors.white)),
     );
   }
 }

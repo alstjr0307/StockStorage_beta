@@ -72,47 +72,34 @@ class _StoragePostState extends State<StoragePost>
       setState(() {
         isLoading = true;
       });
-      var tagurl = "http://13.125.62.90/api/v1/TaggitTag/?name=${widget.tag}";
-      print(tagurl);
-
-      final tagresponse = await dio.get(
-        tagurl,
-        options: Options(headers: {"Authorization": "Token ${token}"}),
-      );
-
-      if (tagresponse.data.toString() == '[]') {
-        boolcontent = false;
-      } else {
-        var tagid = tagresponse.data[0]['id'];
-
-        var tagitemurl =
-            "http://13.125.62.90/api/v1/TaggitTaggedItem/?tag=${tagid.toString()}";
-
-        final taggitemresponse = await dio.get(tagitemurl,
-            options: Options(headers: {"Authorization": "Token ${token}"}));
-
-        for (var i = 0; i < taggitemresponse.data.length; i++) {
-          postlist.add(taggitemresponse.data[i]['object_id'].toString());
-        }
-
-        String idlist = '';
-        for (var i = 0; i < postlist.length; i++) {
-          idlist = idlist + postlist[i] + ',';
-        }
-        var url =
-            "http://13.125.62.90/api/v1/BlogPosts/?id_in=${idlist}&page=" +
-                (index + 1).toString();
-
-        final response = await dio.get(url,
-            options: Options(headers: {"Authorization": "Token ${token}"}));
-        maxpage = response.data['count'] ~/ 10 + 1;
-
-        tList = [];
-        for (int i = 0; i < response.data['results'].length; i++) {
-          tList.add(response.data['results'][i]);
-        }
-        boolcontent = true;
+      var tagitemurl =
+          "http://13.125.62.90/api/v1/TaggitTaggedItem/?namee=${widget.tag}";
+      print(tagitemurl);
+      final taggitemresponse = await dio.get(tagitemurl,
+          options: Options(headers: {"Authorization": "Token ${token}"}));
+      print(taggitemresponse.data);
+      print(taggitemresponse.data.length);
+      for (var i = 0; i < taggitemresponse.data.length; i++) {
+        postlist.add(taggitemresponse.data[i]['object_id'].toString());
       }
+
+      String idlist = '';
+      for (var i = 0; i < postlist.length; i++) {
+        idlist = idlist + postlist[i] + ',';
+      }
+      var url = "http://13.125.62.90/api/v1/BlogPosts/?id_in=${idlist}&page=" +
+          (index + 1).toString();
+
+      final response = await dio.get(url,
+          options: Options(headers: {"Authorization": "Token ${token}"}));
+      maxpage = response.data['count'] ~/ 10 + 1;
+
+      tList = [];
+      for (int i = 0; i < response.data['results'].length; i++) {
+        tList.add(response.data['results'][i]);
+      }
+      boolcontent = true;
+
       print(page);
       setState(() {
         isLoading = false;
@@ -167,7 +154,11 @@ class _StoragePostState extends State<StoragePost>
       );
     else {
       return Container(
-        child: Center(child: Text('게시물이 없습니다', style: TextStyle(color:Colors.blueGrey, fontSize: 20),)),
+        child: Center(
+            child: Text(
+          '게시물이 없습니다',
+          style: TextStyle(color: Colors.blueGrey, fontSize: 20),
+        )),
       );
     }
   }

@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_html/style.dart';
+
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
@@ -108,7 +108,6 @@ Widget commentList(List comment_set, int count, int userId, String token) {
                                 },
                               );
                               print(response.bodyBytes);
-
                             }),
                       Text(i['time'],
                           style: TextStyle(color: Colors.grey, fontSize: 10)),
@@ -133,26 +132,30 @@ Widget commentList(List comment_set, int count, int userId, String token) {
 Future<Map> getPostData(int postId, Map content) async {
   var sharedPreferences = await SharedPreferences.getInstance();
   var token = sharedPreferences.getString("token");
-
+  print( '포스트 $postId');
   final response = await http.get(
-      Uri.http('13.125.62.90', "api/v1/BlogPosts/${postId}/"),
-      headers: {"Authorization": "Token ${token}"}); //게시물 가져오기
+    Uri.http('13.125.62.90', "api/v1/BlogPosts/${postId}/"),
+  ); //게시물 가져오기
+  print(response.statusCode);
   print('포스트 ${postId}');
   if (response.statusCode == 200) {
     // 만약 서버가 OK 응답을 반환하면, JSON을 파싱합니다.
     content = jsonDecode(utf8.decode(response.bodyBytes));
+    content['time'] =
+        DateFormat("M월dd일 H:m").format(DateTime.parse(content['create_dt']));
+    if (token != null) {
+      content['id'] = sharedPreferences.getInt("userID");
+      content['token'] = token;
+    }
+    for (var i in content['blogpostcomment_set']) {
+      i['time'] = DateFormat("M월dd일 H:m").format(DateTime.parse(i['created']));
+    }
+
+    return content;
   } else {
     // 만약 응답이 OK가 아니면, 에러를 던집니다.
     throw Exception('Failed to load post');
   }
 
-  content['time'] =
-      DateFormat("M월dd일 H:m").format(DateTime.parse(content['create_dt']));
-  content['id'] = sharedPreferences.getInt("userID");
-  content['token'] = token;
-  for (var i in content['blogpostcomment_set']) {
-      i['time'] = DateFormat("M월dd일 H:m").format(DateTime.parse(i['created']));
-    }
 
-  return content;
 }

@@ -10,6 +10,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'addPost.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+
 class AllPost extends StatefulWidget {
   @override
   _AllPostState createState() => _AllPostState();
@@ -17,6 +19,17 @@ class AllPost extends StatefulWidget {
 
 class _AllPostState extends State<AllPost>
     with AutomaticKeepAliveClientMixin<AllPost> {
+
+  final BannerAd myBanner = BannerAd(
+    adUnitId: BannerAd.testAdUnitId, //자신의 UnitID
+    size: AdSize.banner,
+    request: AdRequest(),
+    listener: AdListener(),
+  );
+  AdWidget adWidget;
+  Container adContainer;
+
+
 
   ScrollController _sc = new ScrollController();
 
@@ -26,11 +39,28 @@ class _AllPostState extends State<AllPost>
   final dio = new Dio();
   int maxpage;
   var posttype = '';
-
+  var sharedPreferences;
+  var token;
   @override
   void initState() {
     _getMoreData(page);
+    Future(() async => await myBanner.load()).then((_) {
+      if (!mounted) return;
+      setState(() {
+        adWidget = AdWidget(
+          ad: myBanner,
+        );
+        adContainer = Container(
+          alignment: Alignment.center,
+          child: adWidget,
+          width: myBanner.size.width.toDouble(),
+          height: myBanner.size.height.toDouble(),
+        );
+      });
+    });
     super.initState();
+
+
     _sc.addListener(() {
       if (_sc.position.pixels == _sc.position.maxScrollExtent &&
           page < maxpage) {
@@ -42,11 +72,12 @@ class _AllPostState extends State<AllPost>
 
   @override
   void dispose() {
+
     _sc.dispose();
     page = 0;
     posts = [];
     isLoading = false;
-
+    myBanner.dispose();
     super.dispose();
   }
 
@@ -54,8 +85,8 @@ class _AllPostState extends State<AllPost>
     //데이터 추가하기
     List tList = [];
 
-    var sharedPreferences = await SharedPreferences.getInstance();
-    var token = sharedPreferences.getString("token"); //token 값 불러오기
+    sharedPreferences = await SharedPreferences.getInstance();
+    token = sharedPreferences.getString("token"); //token 값 불러오기
 
     if (!isLoading) {
       setState(() {
@@ -65,8 +96,7 @@ class _AllPostState extends State<AllPost>
       var url = "http://13.125.62.90/api/v1/BlogPosts/?page=" +
           (index + 1).toString();
       print(url);
-      final response = await dio.get(url,
-          options: Options(headers: {"Authorization": "Token ${token}"}));
+      final response = await dio.get(url);
       maxpage = (response.data['count'] - 1) ~/ 10 + 1;
       print('맥페${maxpage}');
       tList = [];
@@ -88,7 +118,6 @@ class _AllPostState extends State<AllPost>
         posts.addAll(tList);
         page++;
       });
-      print('페이지${page}');
     }
   }
 
@@ -105,7 +134,7 @@ class _AllPostState extends State<AllPost>
     return Container(
       child: RefreshIndicator(
         child: ListView.builder(
-            itemCount: posts.length + 1,
+            itemCount: posts.length +1,
             controller: _sc,
             // Add one more item for progress indicator
             padding: EdgeInsets.symmetric(vertical: 8.0),
@@ -113,7 +142,10 @@ class _AllPostState extends State<AllPost>
               print('index${index}');
               if (index == posts.length) {
                 return _buildProgressIndicator();
-              } else {
+
+
+              }
+              else {
                 return Container(
                   margin: new EdgeInsets.fromLTRB(5, 0, 5, 0),
                   width: 25.0,
@@ -230,8 +262,9 @@ class _AllPostState extends State<AllPost>
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('전체'),
+        title: Text('최신글'),
         actions: [
+          if (token !=null)
           IconButton(icon: Icon(Icons.add), onPressed: () {
             Navigator.push(
               context,
@@ -244,7 +277,12 @@ class _AllPostState extends State<AllPost>
         ],
       ),
 
-      body: _buildList(),
+      body: Column(
+        children: [
+          adContainer ?? Container(),
+          Expanded(child: _buildList()),
+        ],
+      ),
     );
   }
 
