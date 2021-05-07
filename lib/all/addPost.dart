@@ -16,24 +16,6 @@ import 'package:html_editor_enhanced/html_editor.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 
-
-class Stocks {
-  final String name, descrip;
-
-  Stocks({this.name, this.descrip});
-
-  factory Stocks.fromJson(Map<String, dynamic> json) {
-    return new Stocks(
-      name: json['name'],
-      descrip: json['market'],
-    );
-  }
-}
-
-
-
-
-
 class AddPost extends StatefulWidget {
   @override
   _AddPostState createState() => _AddPostState();
@@ -42,11 +24,10 @@ class AddPost extends StatefulWidget {
 class _AddPostState extends State<AddPost> {
   bool asTabs = false;
   String selectedValue;
-  String preselectedValue = "dolor sit";
 
   List<int> selectedItems = [];
   static const String appTitle = "Search Choices demo";
-  final String loremIpsum ="Lorem sdf sdfipsum dsf sdf dolor";
+  final String loremIpsum = "Lorem sdf sdfipsum dsf sdf dolor";
 
   final List<DropdownMenuItem> items = [];
 
@@ -55,47 +36,28 @@ class _AddPostState extends State<AddPost> {
   TextEditingController titleController = TextEditingController();
   TextEditingController contentController = TextEditingController();
 
-  List<Stocks> _searchResult = [];
-  List<Stocks> _stocks = [];
-
   String category;
-  Future<String> _loadFromAsset() async {
+
+  Future<List> _loadFromAsset() async {
     final String data = await rootBundle.loadString("assets/KStock.json");
     var json = jsonDecode(data);
     setState(() {
       for (Map stock in json) {
+        items.add(DropdownMenuItem(
+          child: Text(stock["name"]),
+          value: stock["name"],
+        ));
       }
     });
-    return data;
+    return items;
   }
+
   @override
   void initState() {
-    String wordPair = "";
-    loremIpsum
-        .toLowerCase()
-        .replaceAll(",", "")
-        .replaceAll(".", "")
-        .split(" ")
-        .forEach((word) {
-      if (wordPair.isEmpty) {
-        wordPair = word + " ";
-      } else {
-        wordPair += word;
-        if (items.indexWhere((item) {
-          return (item.value == wordPair);
-        }) ==
-            -1) {
-          items.add(DropdownMenuItem(
-            child: Text(wordPair),
-            value: wordPair,
-          ));
-        }
-        wordPair = "";
-      }
-    });
+    _loadFromAsset();
     super.initState();
-
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -110,7 +72,6 @@ class _AddPostState extends State<AddPost> {
                 TextField(
                   controller: titleController,
                   keyboardType: TextInputType.text,
-                  autofocus: true,
                   decoration: InputDecoration(
                     hintText: "제목을 입력해주세요",
                   ),
@@ -118,11 +79,12 @@ class _AddPostState extends State<AddPost> {
               ],
             ),
           ),
-          SizedBox(height: 30,),
+          SizedBox(
+            height: 30,
+          ),
           Container(
             child: Column(
               children: [
-
                 HtmlEditor(
                   controller: controller,
                   htmlEditorOptions: HtmlEditorOptions(
@@ -231,14 +193,14 @@ class _AddPostState extends State<AddPost> {
             ),
           ),
           Container(
-            child:       SearchableDropdown.multiple(
+            child: SearchableDropdown.multiple(
               items: items,
               selectedItems: selectedItems,
               hint: Padding(
                 padding: const EdgeInsets.all(12.0),
-                child: Text("Select any"),
+                child: Text("종목을 골라주세요"),
               ),
-              searchHint: "Select any",
+              searchHint: "종목 선택",
               onChanged: (value) {
                 setState(() {
                   selectedItems = value;
@@ -246,8 +208,8 @@ class _AddPostState extends State<AddPost> {
               },
               closeButton: (selectedItems) {
                 return (selectedItems.isNotEmpty
-                    ? "Save ${selectedItems.length == 1 ? '"' + items[selectedItems.first].value.toString() + '"' : '(' + selectedItems.length.toString() + ')'}"
-                    : "Save without selection");
+                    ? "확인 ${selectedItems.length == 1 ? '"' + items[selectedItems.first].value.toString() + '"' : '(' + selectedItems.length.toString() + ')'}"
+                    : "선택 안 하기");
               },
               isExpanded: true,
             ),
@@ -256,7 +218,9 @@ class _AddPostState extends State<AddPost> {
             child: Row(
               children: [
                 Text('게시판'),
-                SizedBox(width: 20,),
+                SizedBox(
+                  width: 20,
+                ),
                 Expanded(
                   child: Container(
                     child: DropdownButton(
@@ -290,37 +254,42 @@ class _AddPostState extends State<AddPost> {
               ],
             ),
           ),
-          SizedBox(height: 50,),
+          SizedBox(
+            height: 50,
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              SizedBox(height: 40,),
+              SizedBox(
+                height: 40,
+              ),
               Row(
                 children: [
                   TextButton(
-                    style: TextButton.styleFrom(
-                        backgroundColor: Colors.redAccent),
+                    style:
+                        TextButton.styleFrom(backgroundColor: Colors.redAccent),
                     onPressed: () {
                       controller.clear();
                     },
-                    child:
-                    Text('초기화', style: TextStyle(color: Colors.white)),
+                    child: Text('초기화', style: TextStyle(color: Colors.white)),
                   ),
                   SizedBox(
                     width: 16,
                   ),
                   TextButton(
-                    style: TextButton.styleFrom(
-                        backgroundColor: Colors.blueGrey),
+                    style:
+                        TextButton.styleFrom(backgroundColor: Colors.blueGrey),
                     onPressed: () async {
-                      print(titleController.text);
                       final txt = await controller.getText();
+
                       await addPost(titleController.text, txt, category);
 
                     },
-                    child: Text('작성완료',style: TextStyle(color: Colors.white)),
+                    child: Text('작성완료', style: TextStyle(color: Colors.white)),
                   ),
-                  SizedBox(width: 10,)
+                  SizedBox(
+                    width: 10,
+                  )
                 ],
               ),
             ],
@@ -331,6 +300,22 @@ class _AddPostState extends State<AddPost> {
   }
 
   Future<void> addPost(String title, String content, String category) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          child: new Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              new CircularProgressIndicator(),
+              new Text("글 작성완료중"),
+            ],
+          ),
+        );
+      },
+    );
+    List tag;
     var sharedPreferences = await SharedPreferences.getInstance();
     var token = sharedPreferences.getString("token");
     var formatter = new DateFormat('yyyy-MM-dd H:m');
@@ -364,27 +349,90 @@ class _AddPostState extends State<AddPost> {
             "owner": sharedPreferences.getInt('userID')
           },
         ));
-    print('종료');
-    print(responseerw.statusCode);
-    if (responseerw.statusCode == 201)
+    print('responseerw'+responseerw.body);
+    if (responseerw.statusCode == 201) {
+      var postid = jsonDecode(responseerw.body)["id"];
+      print(postid.toString());
+      print(selectedItems[0]);
+      for (var i = 0; i < selectedItems.length; i++) {
+        print(items[selectedItems[i]].value.toString());
+        final tagpost =
+            await http.post(Uri.http('13.125.62.90', 'api/v1/TaggitTag/'),
+                headers: {
+                  "Authorization": "Token ${token}",
+                  "Content-Type": "application/json",
+                },
+                body: jsonEncode(<String, dynamic>{
+                  "slug": items[selectedItems[i]].value.toString() + 'z',
+                  "name": items[selectedItems[i]].value.toString()
+                }));
+        if (tagpost.statusCode == 201) {
+          var tagid = jsonDecode(tagpost.body)["id"];
+          print('태그 새로추가 태그아이디는 ${tagid}');
+          final taggit = await http.post(
+            Uri.http('13.125.62.90', 'api/v1/TaggitTaggedItem/'),
+            headers: {
+              "Authorization": "Token ${token}",
+              "Content-Type": "application/json"
+            },
+            body: jsonEncode(<String, dynamic>{
+              "object": postid,
+              "content_type": 14,
+              "tag": tagid
+            }),
+          );
+        } else if (tagpost.statusCode == 400) {
+          print('ww${items[selectedItems[i]].value}');
+          var tagg = await http.get(
+            Uri.http('13.125.62.90', 'api/v1/TaggitTag/',
+                {"name": items[selectedItems[i]].value}),
+            headers: {
+              "Authorization": "Token ${token}",
+              "Content-Type": "application/json"
+            },
+          );
+          print(tagg.statusCode);
+          print(tagg.body);
+          var tagid = jsonDecode(tagg.body)[0]['id'];
+          final taggit = await http.post(
+            Uri.http('13.125.62.90', 'api/v1/TaggitTaggedItem/'),
+            headers: {
+              "Authorization": "Token ${token}",
+              "Content-Type": "application/json"
+            },
+            body: jsonEncode(<String, dynamic>{
+              "object": postid,
+              "content_type": 14,
+              "tag": tagid
+            }),
+          );
+          print('태깃 ${taggit.body}');
+        }
+      }
       Navigator.pop(context);
-    else
-      showDialog(context: context, builder: (context) {
-        return AlertDialog(
-          title: new Text("오류"),
-          content: new Text("제목과 내용을 비워두지 마세요!"),
-          actions: <Widget>[
-            new FlatButton(
-              child: new Text("확인"),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        );
-      });
-
+      Navigator.pop(context);
+    } else {
+      Navigator.pop(context);
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: new Text("오류"),
+            content: new Text("제목과 내용을 비워두지 마세요!"),
+            actions: <Widget>[
+              new FlatButton(
+                child: new Text("확인"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
+
 
   dynamic myEncode(dynamic item) {
     if (item is DateTime) {

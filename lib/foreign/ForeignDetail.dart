@@ -96,9 +96,7 @@ class _ForeignDetailState extends State<ForeignDetail> {
                   child: SingleChildScrollView(
                     child: Html(
                       data: content['content'],
-                      onLinkTap: (url) {
-                        print("Opening $url...");
-                      },
+
                     ),
                     scrollDirection: Axis.vertical,
                   ),

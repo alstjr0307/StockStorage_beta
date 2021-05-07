@@ -86,9 +86,7 @@ class _FreeDetailState extends State<FreeDetail> {
                   child: SingleChildScrollView(
                     child: Html(
                       data: content['content'],
-                      onLinkTap: (url) {
-                        print("Opening $url...");
-                      },
+
                     ),
                     scrollDirection: Axis.vertical,
                   ),

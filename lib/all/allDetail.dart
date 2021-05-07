@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_app/all/allpost.dart';
+import 'package:flutter_app/search/writerpost.dart';
 
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -85,6 +86,7 @@ class _allDetailState extends State<allDetail> {
           'updated': formatter.format(now),
           'content': comment
         }));
+    print('댓글달기' + likeresponse.body);
     setState(() {});
   }
 
@@ -179,52 +181,78 @@ class _allDetailState extends State<allDetail> {
           else {
             return Scaffold(
               appBar: AppBar(
-                title: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(snapshot.data['title']),
-                    if (snapshot.data['id'] == snapshot.data['owner'])
-                      IconButton(
-                          icon: Icon(Icons.delete),
-                          onPressed: () async {
-                            await showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  print(snapshot.data['token']);
-                                  return AlertDialog(
-                                    title: Text('삭제'),
-                                    content: Text('게시물 삭제하시겠습니까?'),
-                                    actions: [
-                                      FlatButton(
-                                        onPressed: () async {
-                                          Navigator.of(context).pop();
-                                          Navigator.of(context).pop();
+                title: Text(snapshot.data['title']),
+                actions: [
+                  PopupMenuButton<int>(
+                    onSelected: (result) async {
+                      if (result == 0) {
+                        await showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            print(snapshot.data['token']);
+                            return AlertDialog(
+                              title: Text('삭제'),
+                              content: Text('게시물 삭제하시겠습니까?'),
+                              actions: [
+                                FlatButton(
+                                  onPressed: () async {
+                                    Navigator.of(context).pop();
+                                    Navigator.of(context).pop();
 
-                                          print(snapshot.data['id']);
-                                          var response = await http.delete(
-                                            Uri.http('13.125.62.90',
-                                                'api/v1/BlogPosts/${widget.index}/'),
-                                            headers: {
-                                              "Authorization":
-                                                  "Token ${snapshot.data['token']}",
-                                              "Content-Type": "application/json"
-                                            },
-                                          );
-                                        },
-                                        child: Text('예'),
-                                      ),
-                                      FlatButton(
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                          child: Text('아니오')),
-                                    ],
-                                  );
-                                });
-                          })
-                  ],
-                ),
-                centerTitle: true,
+                                    print(snapshot.data['id']);
+                                    var response = await http.delete(
+                                      Uri.http('13.125.62.90',
+                                          'api/v1/BlogPosts/${widget.index}/'),
+                                      headers: {
+                                        "Authorization":
+                                            "Token ${snapshot.data['token']}",
+                                        "Content-Type": "application/json"
+                                      },
+                                    );
+                                  },
+                                  child: Text('예'),
+                                ),
+                                FlatButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Text('아니오')),
+                              ],
+                            );
+                          },
+                        );
+                      }
+                      else if(result == 2) {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => WriterPost(userID : snapshot.data['owner'], nickname: snapshot.data['writer']))
+                        );
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      if (snapshot.data['id'] == snapshot.data['owner'])
+                        PopupMenuItem(
+                          value: 0,
+                          child: Text(
+                            "게시물 삭제",
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w700),
+                          ),
+                        ),
+                      PopupMenuItem(
+                        value: 2,
+                        child: Text(
+                          "작성자 게시물 더보기",
+                          style: TextStyle(
+                              color: Colors.black, fontWeight: FontWeight.w700),
+                        ),
+                      ),
+                    ],
+                    icon: Icon(Icons.menu),
+                    offset: Offset(0, 20),
+                  ),
+                ],
               ),
               body: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -314,6 +342,36 @@ class _allDetailState extends State<allDetail> {
                                   ),
                                 ),
                                 contentText(snapshot.data['content']), //내용
+                                SizedBox(height: 10),
+                                SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Row(children: [
+                                    Container(
+                                      padding: EdgeInsets.all(5),
+                                      margin: EdgeInsets.fromLTRB(0, 0, 3, 0),
+                                      decoration: BoxDecoration(
+                                          color: Colors.blueAccent,
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(10))),
+                                      child: Text(
+                                        '연관 종목',
+                                        style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white),
+                                      ),
+                                    ),
+                                    for (Map i in snapshot
+                                        .data['taggittaggeditem_set'])
+                                      Container(
+                                          child: Text(
+                                        i['name'] + '  ',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.blue),
+                                      )),
+                                  ]),
+                                ),
 
                                 //댓글 리스트
                                 Column(

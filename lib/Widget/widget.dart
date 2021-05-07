@@ -31,9 +31,7 @@ Widget contentText(String content) {
                   color: Colors.black26, width: 1, style: BorderStyle.solid))),
       child: Html(
         data: content,
-        onLinkTap: (url) {
-          print("Opening $url...");
-        },
+
       ),
     ),
     scrollDirection: Axis.vertical,

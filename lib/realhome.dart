@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/search/titlesearch.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:http/http.dart' as http;
+import 'package:yahoofin/yahoofin.dart';
+import 'package:flutter_search_bar/flutter_search_bar.dart';
 import 'dart:convert';
 import 'dart:async';
 import 'all/allDetail.dart';
@@ -18,14 +21,18 @@ import 'domestic/domesticPost.dart';
 import 'foreign/ForeignPost.dart';
 import 'free/freePost.dart';
 import 'Navigatior/Storage/storage.dart';
+import 'package:flutter_app/Widget/Search.dart';
+
+
+
 
 class RealHome extends StatefulWidget {
+  final List list = List.generate(10, (index) =>"Text $index");
   @override
   _RealHomeState createState() => _RealHomeState();
 }
 
 class _RealHomeState extends State<RealHome> {
-
   Future<InitializationStatus> _initGoogleMobileAds() {
     return MobileAds.instance.initialize();
   }
@@ -48,17 +55,14 @@ class _RealHomeState extends State<RealHome> {
 
   @override
   void initState() {
-
     super.initState();
     checkLoginStatus();
-
   }
+
   @override
   void dispose() {
-
     super.dispose();
   }
-
 
   Future<List> getPostAll() async {
     var sharedPreferences = await SharedPreferences.getInstance();
@@ -68,9 +72,11 @@ class _RealHomeState extends State<RealHome> {
     var urlFor = "http://13.125.62.90/api/v1/BlogPosts/?category=F";
     var urldom = "http://13.125.62.90/api/v1/BlogPosts/?category=D";
     var urlfree = "http://13.125.62.90/api/v1/BlogPosts/?category=R";
+
     print('중간');
     final responseall = await dio.get(urlall);
     print('1');
+    print(responseall.statusCode);
     final responsefor = await dio.get(
       urlFor,
     );
@@ -80,11 +86,13 @@ class _RealHomeState extends State<RealHome> {
     final responsefree = await dio.get(
       urlfree,
     );
+
     allList = responseall.data['results'];
     print('중간');
     forList = responsefor.data['results'];
     domList = responsedom.data['results'];
     freeList = responsefree.data['results'];
+    print(username);
     username = sharedPreferences.getString('nickname');
     return freeList;
   }
@@ -133,15 +141,12 @@ class _RealHomeState extends State<RealHome> {
                         );
                         sharedPreferences.clear();
                         sharedPreferences.commit();
-                        setState(() {
-
-                        });
+                        setState(() {});
                         new Future.delayed(new Duration(seconds: 1), () {
-                           //pop dialog
+                          //pop dialog
 
                           Navigator.pop(context);
                         });
-
                       },
                       child: Container(
                         padding: EdgeInsets.fromLTRB(10, 2, 10, 2),
@@ -188,53 +193,61 @@ class _RealHomeState extends State<RealHome> {
   checkLoginStatus() async {
     sharedPreferences = await SharedPreferences.getInstance();
     if (sharedPreferences.getString("token") != null) {
-
       username = sharedPreferences.getString("nickname");
     }
     print(sharedPreferences.getString("token"));
+  }
 
+  AppBar buildAppBar(BuildContext context) {
+    return new AppBar(
+      title: Row(
+        children: [
+          Icon(
+            Icons.bar_chart,
+            size: 30,
+          ),
+          Text(
+            '주식저장소 홈',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
+      actions: [
+        IconButton(
+          onPressed: () {
+            showSearch(context: context, delegate: Search(widget.list));
+          },
+          icon: Icon(Icons.search),
+        ),
+        if (username != null)
+          IconButton(
+            icon: Icon(
+              Icons.person,
+              color: Colors.blue,
+            ),
+            onPressed: () {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => Profile()));
+            },
+          )
+      ],
+    );
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext cont) {
     return FutureBuilder(
         future: getPostAll(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return Scaffold(
+              appBar: buildAppBar(cont),
               drawer: CustomDrawer(),
-              appBar: AppBar(
-                title: Row(
-                  children: [
-                    Icon(
-                      Icons.bar_chart,
-                      size: 30,
-                    ),
-                    Text(
-                      '주식저장소 홈',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-
-                actions: [
-                  if(username != null)
-                    IconButton(
-                      icon: Icon(
-                        Icons.person,
-                        color: Colors.blue,
-                      ),
-                      onPressed: () {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) => Profile()));
-                      },
-                    )
-                ],
-              ),
               body: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: ListView(
                   children: [
+                    Stock(),
                     PostAll(allList, context),
                     PostFor(forList, context),
                     PostDom(domList, context),
@@ -253,6 +266,26 @@ class _RealHomeState extends State<RealHome> {
             );
         });
   }
+}
+
+Widget Stock() {
+  return Container(
+      child: Card(
+          color: Colors.white60,
+          elevation: 3,
+          shadowColor: Colors.blue,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                child: Row(
+                  children: [
+                    Text('코스피'),
+                  ],
+                ),
+              )
+            ],
+          )));
 }
 
 Widget PostAll(List posts, BuildContext context) {
@@ -284,7 +317,6 @@ Widget PostAll(List posts, BuildContext context) {
                       ],
                     ),
                     onPressed: () {
-
                       Navigator.push(context,
                           MaterialPageRoute(builder: (context) => AllPost()));
                     })

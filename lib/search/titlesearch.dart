@@ -3,59 +3,85 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
 import 'package:back_button_interceptor/back_button_interceptor.dart';
-import 'storagedetail.dart';
+import 'package:flutter_app/all/allDetail.dart';
 import 'package:flutter_app/Navigatior/postTab.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_app/all/allDetail.dart';
 import 'package:intl/intl.dart';
-class StoragePost extends StatefulWidget {
-  final String tag;
+import 'package:flutter_app/all/addPost.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
-  const StoragePost({Key key, this.tag}) : super(key: key);
+class TitleSearch extends StatefulWidget {
+  final String title;
+  const TitleSearch({Key key, this.title}) : super(key: key); //index = 게시물 번호
 
   @override
-  _StoragePostState createState() => _StoragePostState();
+  _TitleSearchState createState() => _TitleSearchState();
 }
 
-class _StoragePostState extends State<StoragePost>
-    with TickerProviderStateMixin {
-  bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
-    Navigator.pop(context); // Do some stuff.
-    return true;
-  }
+class _TitleSearchState extends State<TitleSearch>
+    with AutomaticKeepAliveClientMixin<TitleSearch> {
 
-  bool boolcontent = true;
+  final BannerAd myBanner = BannerAd(
+    adUnitId: BannerAd.testAdUnitId, //자신의 UnitID
+    size: AdSize.banner,
+    request: AdRequest(),
+    listener: AdListener(),
+  );
+  AdWidget adWidget;
+  Container adContainer;
+
+
+
   ScrollController _sc = new ScrollController();
+
   static int page = 0;
   bool isLoading = false;
   List posts = [];
   final dio = new Dio();
   int maxpage;
-
-  @override
+  var posttype = '';
+  var sharedPreferences;
+  var token;
+  var userID;
   @override
   void initState() {
-    this._getMoreData(page);
+    _getMoreData(page);
+    Future(() async => await myBanner.load()).then((_) {
+      if (!mounted) return;
+      setState(() {
+        adWidget = AdWidget(
+          ad: myBanner,
+        );
+        adContainer = Container(
+          alignment: Alignment.center,
+          child: adWidget,
+          width: myBanner.size.width.toDouble(),
+          height: myBanner.size.height.toDouble(),
+        );
+      });
+    });
     super.initState();
+
+
     _sc.addListener(() {
       if (_sc.position.pixels == _sc.position.maxScrollExtent &&
           page < maxpage) {
-        this._getMoreData(page);
+        _getMoreData(page);
       }
     });
-    BackButtonInterceptor.add(myInterceptor);
     print('이닛');
   }
 
   @override
   void dispose() {
+
     _sc.dispose();
     page = 0;
     posts = [];
     isLoading = false;
-    BackButtonInterceptor.remove(myInterceptor);
+    myBanner.dispose();
     super.dispose();
   }
 
@@ -63,66 +89,39 @@ class _StoragePostState extends State<StoragePost>
     //데이터 추가하기
     List tList = [];
 
-    var sharedPreferences = await SharedPreferences.getInstance();
-    var token = sharedPreferences.getString("token"); //token 값 불러오기
-    print('testmei');
-    List postlist = [];
+    sharedPreferences = await SharedPreferences.getInstance();
+    token = sharedPreferences.getString("token"); //token 값 불러오기
+    userID = sharedPreferences.getInt("userID");
     if (!isLoading) {
-      print(isLoading);
       setState(() {
         isLoading = true;
       });
-      var tagitemurl =
-          "http://13.125.62.90/api/v1/TaggitTaggedItem/?namee=${widget.tag}";
-      print(tagitemurl);
-      final taggitemresponse = await dio.get(tagitemurl,
-          options: Options(headers: {"Authorization": "Token ${token}"}));
-      print(taggitemresponse.data);
-      print(taggitemresponse.data.length);
-      for (var i = 0; i < taggitemresponse.data.length; i++) {
-        postlist.add(taggitemresponse.data[i]['object'].toString());
+
+      var url = "http://13.125.62.90/api/v1/BlogPosts/?titlesearch=${widget.title}&page=" +
+          (index + 1).toString();
+      print(url);
+      final response = await dio.get(url);
+      maxpage = (response.data['count'] - 1) ~/ 10 + 1;
+      print('맥페${maxpage}');
+      tList = [];
+
+      for (int i = 0; i < response.data['results'].length; i++) {
+        tList.add(response.data['results'][i]);
+        if (response.data['results'][i]['category'] == 'D')
+          tList[i]['type'] = '국내';
+        else if (response.data['results'][i]['category'] == 'F')
+          tList[i]['type'] = '해외';
+        else if (response.data['results'][i]['category'] == 'R')
+          tList[i]['type'] = '자유';
+        tList[i]['time'] = DateFormat("M월dd일 H:m").format(DateTime.parse(tList[i]['create_dt']));
       }
 
-      String idlist = '';
-      for (var i = 0; i < postlist.length; i++) {
-        idlist = idlist + postlist[i] + ',';
-      }
-      print('idlist' +idlist);
-      if (idlist != '') {
-        print('1');
-        var url = "http://13.125.62.90/api/v1/BlogPosts/?id_in=${idlist}&page=" +
-            (index + 1).toString();
 
-        final response = await dio.get(url,
-            options: Options(headers: {"Authorization": "Token ${token}"}));
-        maxpage = response.data['count'] ~/ 10 + 1;
-        print('중간까지됨');
-        tList = [];
-        for (int i = 0; i < response.data['results'].length; i++) {
-          tList.add(response.data['results'][i]);
-          tList[i]['time'] = DateFormat("M월dd일 H:m").format(DateTime.parse(tList[i]['create_dt']));
-
-        }
-
-        boolcontent = true;
-
-        print(page);
-        setState(() {
-          isLoading = false;
-          posts.addAll(tList);
-          page++;
-        });
-        print(posts.length);
-        print(page);
-      }
-      else {
-        maxpage=0;
-        posts=[];
-        setState(() {
-          isLoading= false;
-        });
-
-      }
+      setState(() {
+        isLoading = false;
+        posts.addAll(tList);
+        page++;
+      });
     }
   }
 
@@ -136,20 +135,21 @@ class _StoragePostState extends State<StoragePost>
   }
 
   Widget _buildList() {
-    print('13');
-    if (boolcontent == true)
-      return RefreshIndicator(
+    return Container(
+      child: RefreshIndicator(
         child: ListView.builder(
-            itemCount: posts.length + 1,
+            itemCount: posts.length +1,
             controller: _sc,
             // Add one more item for progress indicator
             padding: EdgeInsets.symmetric(vertical: 8.0),
             itemBuilder: (BuildContext context, int index) {
-              print('ㄱㄱ ${posts.length}');
               print('index${index}');
               if (index == posts.length) {
                 return _buildProgressIndicator();
-              } else {
+
+
+              }
+              else {
                 return Container(
                   margin: new EdgeInsets.fromLTRB(5, 0, 5, 0),
                   width: 25.0,
@@ -209,6 +209,17 @@ class _StoragePostState extends State<StoragePost>
                               ),
                             ),
                           ),
+                          Container(
+                            margin: const EdgeInsets.all(4.0),
+                            padding: const EdgeInsets.all(10.0),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.blueAccent,
+                              border: Border.all(width: 1.0, color: Colors.white),
+                            ),
+                            child: Text(posts[index]['type'],
+                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                          )
                         ],
                       ),
                     ),
@@ -227,16 +238,8 @@ class _StoragePostState extends State<StoragePost>
               }
             }),
         onRefresh: _getData,
-      );
-    else {
-      return Container(
-        child: Center(
-            child: Text(
-          '게시물이 없습니다',
-          style: TextStyle(color: Colors.blueGrey, fontSize: 20),
-        )),
-      );
-    }
+      ),
+    );
   }
 
   Widget _buildProgressIndicator() {
@@ -253,25 +256,25 @@ class _StoragePostState extends State<StoragePost>
 
   @override
   bool get wantKeepAlive => true;
-
   Map user;
   List data;
-
   Widget screen;
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.tag),
+        title: Text(widget.title+' 제목검색'),
       ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.arrow_left),
-        onPressed: () {
-          Navigator.pop(context);
-        },
+      body: Column(
+        children: [
+          adContainer ?? Container(),
+          Expanded(child: _buildList()),
+        ],
       ),
-      body: _buildList(),
     );
   }
+
 }

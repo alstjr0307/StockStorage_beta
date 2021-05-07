@@ -99,9 +99,7 @@ class _storageDetailState extends State<storageDetail> {
                   child: SingleChildScrollView(
                     child: Html(
                       data: content['content'],
-                      onLinkTap: (url) {
-                        print("Opening $url...");
-                      },
+
                     ),
                     scrollDirection: Axis.vertical,
                   ),
