@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/search/titlesearch.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -23,11 +24,9 @@ import 'free/freePost.dart';
 import 'Navigatior/Storage/storage.dart';
 import 'package:flutter_app/Widget/Search.dart';
 
-
-
-
 class RealHome extends StatefulWidget {
-  final List list = List.generate(10, (index) =>"Text $index");
+  final List<String> list = List.generate(10, (index) => "Text $index");
+
   @override
   _RealHomeState createState() => _RealHomeState();
 }
@@ -62,6 +61,7 @@ class _RealHomeState extends State<RealHome> {
   @override
   void dispose() {
     super.dispose();
+    searchcontroller.dispose();
   }
 
   Future<List> getPostAll() async {
@@ -198,26 +198,70 @@ class _RealHomeState extends State<RealHome> {
     print(sharedPreferences.getString("token"));
   }
 
+  //검색기능
+  final searchcontroller = TextEditingController();
+  Widget appBarTitle = new Row(children: [
+    Text("주식저장소 홈"),
+    Icon(Icons.bar_chart),
+  ]);
+  Icon actionIcon = new Icon(Icons.search);
+  String hintText = "게시물 검색";
+
   AppBar buildAppBar(BuildContext context) {
     return new AppBar(
-      title: Row(
-        children: [
-          Icon(
-            Icons.bar_chart,
-            size: 30,
-          ),
-          Text(
-            '주식저장소 홈',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-        ],
-      ),
+      centerTitle: true,
+      title: appBarTitle,
       actions: [
-        IconButton(
+        new IconButton(
+          icon: actionIcon,
           onPressed: () {
-            showSearch(context: context, delegate: Search(widget.list));
+            setState(() {
+              if (this.actionIcon.icon == Icons.search) {
+                this.actionIcon = new Icon(Icons.close);
+                this.appBarTitle = Row(
+                  children: [
+                    Flexible(
+                      child: new TextField(
+                        autofocus: true,
+                        controller: searchcontroller,
+                        style: new TextStyle(
+                          color: Colors.white,
+                        ),
+                        decoration: new InputDecoration(
+                            prefixIcon:
+                                new Icon(Icons.search, color: Colors.white),
+                            hintText: hintText,
+                            hintStyle: new TextStyle(color: Colors.white)),
+                      ),
+                    ),
+                    new IconButton(
+                        icon: Icon(Icons.arrow_right),
+                        onPressed: () {
+                          setState(() {
+                            this.actionIcon = new Icon(Icons.search);
+                            this.appBarTitle = new Text("주식 저장소 홈");
+                          });
+
+                          if (searchcontroller.text != '') {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => TitleSearch(
+                                        title: searchcontroller.text)));
+
+
+                          }
+
+                        })
+                  ],
+                );
+              } else {
+                print(searchcontroller.text);
+                this.actionIcon = new Icon(Icons.search);
+                this.appBarTitle = new Text("주식 저장소 홈");
+              }
+            });
           },
-          icon: Icon(Icons.search),
         ),
         if (username != null)
           IconButton(
@@ -241,7 +285,7 @@ class _RealHomeState extends State<RealHome> {
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return Scaffold(
-              appBar: buildAppBar(cont),
+              appBar: buildAppBar(context),
               drawer: CustomDrawer(),
               body: Padding(
                 padding: const EdgeInsets.all(8.0),
