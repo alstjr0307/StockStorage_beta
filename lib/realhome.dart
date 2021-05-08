@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/search/allsearch.dart';
 import 'package:flutter_app/search/titlesearch.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:http/http.dart' as http;
@@ -44,13 +45,22 @@ class _RealHomeState extends State<RealHome> {
     FreePost(),
     Storage()
   ];
-  String username;
+  var username;
   var sharedPreferences;
   var allList = [];
   var forList = [];
   var domList = [];
   var freeList = [];
   final dio = new Dio();
+
+  checkLoginStatus() async {
+    sharedPreferences = await SharedPreferences.getInstance();
+    print('1');
+    if (sharedPreferences.getString("token") != null) {
+      username = sharedPreferences.getString("nickname");
+    }
+    print('토큰' + sharedPreferences.getString("token"));
+  }
 
   @override
   void initState() {
@@ -74,17 +84,41 @@ class _RealHomeState extends State<RealHome> {
     var urlfree = "http://13.125.62.90/api/v1/BlogPosts/?category=R";
 
     print('중간');
-    final responseall = await dio.get(urlall);
-    print('1');
+    final responseall = await dio.get(urlall,
+        options: Options(
+          followRedirects: false,
+          validateStatus: (status) {
+            return status < 500;
+          },
+        ));
+    print('2231');
     print(responseall.statusCode);
     final responsefor = await dio.get(
       urlFor,
+      options: Options(
+        followRedirects: false,
+        validateStatus: (status) {
+          return status < 500;
+        },
+      )
     );
     final responsedom = await dio.get(
       urldom,
+        options: Options(
+          followRedirects: false,
+          validateStatus: (status) {
+            return status < 500;
+          },
+        )
     );
     final responsefree = await dio.get(
       urlfree,
+        options: Options(
+          followRedirects: false,
+          validateStatus: (status) {
+            return status < 500;
+          },
+        )
     );
 
     allList = responseall.data['results'];
@@ -92,9 +126,13 @@ class _RealHomeState extends State<RealHome> {
     forList = responsefor.data['results'];
     domList = responsedom.data['results'];
     freeList = responsefree.data['results'];
-    print(username);
-    username = sharedPreferences.getString('nickname');
-    return freeList;
+    print(responseall.statusCode);
+    if (responseall.statusCode == 200)
+      return freeList;
+
+    else {
+    return Future.error(responseall.statusCode);
+    }
   }
 
   Widget CustomDrawer() {
@@ -109,9 +147,22 @@ class _RealHomeState extends State<RealHome> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  if (username == null) Text('비회원') else Text(username),
+                  if (username == null)
+                    Text(
+                      '비회원',
+                      style: TextStyle(
+                          fontFamily: 'Hoon', fontWeight: FontWeight.bold),
+                    )
+                  else
+                    Text(
+                      username,
+                      style: TextStyle(
+                          fontFamily: 'Hoon',
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold),
+                    ),
                   SizedBox(
-                    height: 50,
+                    height: 20,
                   ),
                   if (username == null)
                     TextButton(
@@ -120,9 +171,13 @@ class _RealHomeState extends State<RealHome> {
                         Navigator.of(context).push(MaterialPageRoute(
                             builder: (context) => LoginPage()));
                       },
-                    )
-                  else
+                    ),
+                  if (username != null)
                     TextButton(
+                      style: TextButton.styleFrom(
+                          padding: EdgeInsets.zero,
+                          minimumSize: Size(50, 30),
+                          alignment: Alignment.centerLeft),
                       onPressed: () {
                         showDialog(
                           context: context,
@@ -141,12 +196,45 @@ class _RealHomeState extends State<RealHome> {
                         );
                         sharedPreferences.clear();
                         sharedPreferences.commit();
-                        setState(() {});
+                        username = null;
+
                         new Future.delayed(new Duration(seconds: 1), () {
                           //pop dialog
-
+                          setState(() {});
                           Navigator.pop(context);
                         });
+                      },
+                      child: Container(
+                        padding: EdgeInsets.fromLTRB(10, 2, 10, 2),
+                        margin: EdgeInsets.all(0),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.rectangle,
+                          border: Border.all(width: 1.0, color: Colors.white),
+                          borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                        ),
+                        child: Align(
+                          alignment: Alignment.bottomCenter,
+                          child: Text(
+                            "로그아웃",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  //프로필 가기
+                  if (username != null)
+                    TextButton(
+                      style: TextButton.styleFrom(
+                          padding: EdgeInsets.zero,
+                          minimumSize: Size(50, 30),
+                          alignment: Alignment.centerLeft),
+                      onPressed: () {
+                        Navigator.of(context).push(
+                            MaterialPageRoute(builder: (context) => Profile()));
                       },
                       child: Container(
                         padding: EdgeInsets.fromLTRB(10, 2, 10, 2),
@@ -158,7 +246,7 @@ class _RealHomeState extends State<RealHome> {
                         child: Align(
                           alignment: Alignment.bottomCenter,
                           child: Text(
-                            "로그아웃",
+                            "내 프로필",
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
@@ -190,18 +278,10 @@ class _RealHomeState extends State<RealHome> {
     );
   }
 
-  checkLoginStatus() async {
-    sharedPreferences = await SharedPreferences.getInstance();
-    if (sharedPreferences.getString("token") != null) {
-      username = sharedPreferences.getString("nickname");
-    }
-    print(sharedPreferences.getString("token"));
-  }
-
   //검색기능
   final searchcontroller = TextEditingController();
   Widget appBarTitle = new Row(children: [
-    Text("주식저장소 홈"),
+    Text("주식저장소 홈", style:TextStyle(fontFamily: 'gyeongi')),
     Icon(Icons.bar_chart),
   ]);
   Icon actionIcon = new Icon(Icons.search);
@@ -235,45 +315,31 @@ class _RealHomeState extends State<RealHome> {
                       ),
                     ),
                     new IconButton(
-                        icon: Icon(Icons.arrow_right),
+                        icon: Icon(Icons.arrow_right_alt),
                         onPressed: () {
                           setState(() {
                             this.actionIcon = new Icon(Icons.search);
-                            this.appBarTitle = new Text("주식 저장소 홈");
+                            this.appBarTitle = new Text("주식 저장소 홈", style:TextStyle(fontFamily: 'gyeongi'));
                           });
 
                           if (searchcontroller.text != '') {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => TitleSearch(
-                                        title: searchcontroller.text)));
-
-
+                                    builder: (context) => AllSearch(
+                                        search: searchcontroller.text)));
                           }
-
                         })
                   ],
                 );
               } else {
                 print(searchcontroller.text);
                 this.actionIcon = new Icon(Icons.search);
-                this.appBarTitle = new Text("주식 저장소 홈");
+                this.appBarTitle = new Text("주식 저장소 홈",style:TextStyle(fontFamily: 'gyeongi'));
               }
             });
           },
         ),
-        if (username != null)
-          IconButton(
-            icon: Icon(
-              Icons.person,
-              color: Colors.blue,
-            ),
-            onPressed: () {
-              Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => Profile()));
-            },
-          )
       ],
     );
   }
@@ -297,6 +363,35 @@ class _RealHomeState extends State<RealHome> {
                     PostDom(domList, context),
                     PostFree(freeList, context),
                     Image(image: AssetImage('assets/photos/example.PNG'))
+                  ],
+                ),
+              ),
+            );
+          } else if (snapshot.hasError) {
+            return Scaffold(
+              body: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+
+                      Icon(
+                        Icons.error_outline,
+                        color: Colors.red,
+                        size: 60,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 16),
+                        child: Text('데이터를 불러올 수 없습니다.\n인터넷 연결 상태를 확인해주세요'),
+                      ),
+                    TextButton(onPressed: (){
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                          builder: (context) => RealHome()
+                      ),
+                      );
+                    }, child: Text('재시도')),
+
                   ],
                 ),
               ),
@@ -347,7 +442,7 @@ Widget PostAll(List posts, BuildContext context) {
               children: [
                 Text(
                   '최신글',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'gyeongi'),
                 ),
                 TextButton(
                     child: Row(
@@ -413,7 +508,7 @@ Widget PostFor(List posts, BuildContext context) {
               children: [
                 Text(
                   '해외주식',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'gyeongi'),
                 ),
                 TextButton(
                     child: Row(
@@ -428,7 +523,7 @@ Widget PostFor(List posts, BuildContext context) {
                     ),
                     onPressed: () {
                       Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => AllPost()));
+                          MaterialPageRoute(builder: (context) => ForeignPost()));
                     })
               ],
             ),
@@ -479,7 +574,7 @@ Widget PostDom(List posts, BuildContext context) {
               children: [
                 Text(
                   '국내주식',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'gyeongi'),
                 ),
                 TextButton(
                     child: Row(
@@ -494,7 +589,7 @@ Widget PostDom(List posts, BuildContext context) {
                     ),
                     onPressed: () {
                       Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => AllPost()));
+                          MaterialPageRoute(builder: (context) => DomesticPost()));
                     })
               ],
             ),
@@ -545,7 +640,7 @@ Widget PostFree(List posts, BuildContext context) {
               children: [
                 Text(
                   '자유게시판',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'gyeongi'),
                 ),
                 TextButton(
                     child: Row(
