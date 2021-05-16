@@ -1,10 +1,8 @@
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_app/profile/signup.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import '../home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../realhome.dart';
 
@@ -80,6 +78,10 @@ class _LoginPageState extends State<LoginPage> {
       });
     }
     if (response.statusCode == 400) {
+      var json = jsonDecode(utf8.decode(response.bodyBytes));
+      var message = [];
+
+      print(response.body);
       setState(() {
         _isLoading = false;
         errormsg = Card(
@@ -90,7 +92,7 @@ class _LoginPageState extends State<LoginPage> {
               ListTile(
                 leading: Icon(Icons.error, size: 50),
                 title: Text(
-                  '아이디나 비밀번호가 잘못됐습니다',
+                  json["non_field_errors"][0],
                   style: TextStyle(color: Colors.white),
                 ),
               ),

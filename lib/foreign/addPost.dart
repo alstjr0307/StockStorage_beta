@@ -1,24 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
 import 'package:http/http.dart' as http;
 import 'package:searchable_dropdown/searchable_dropdown.dart';
 import 'dart:async';
-
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'package:intl/intl.dart';
 import 'dart:convert';
 import 'package:html_editor_enhanced/html_editor.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 
-class AddPost extends StatefulWidget {
+class ForeignAddPost extends StatefulWidget {
   @override
-  _AddPostState createState() => _AddPostState();
+  _ForeignAddPostState createState() => _ForeignAddPostState();
 }
 
-class _AddPostState extends State<AddPost> {
+class _ForeignAddPostState extends State<ForeignAddPost> {
   bool asTabs = false;
   String selectedValue;
 
@@ -61,21 +58,18 @@ class _AddPostState extends State<AddPost> {
       appBar: AppBar(
         actions: [
           TextButton(
-            style:TextButton.styleFrom(
-                padding: EdgeInsets.fromLTRB(5,5,5,5),
+            style: TextButton.styleFrom(
+                padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
                 minimumSize: Size(50, 30),
                 alignment: Alignment.centerLeft),
-
             onPressed: () {
               controller.clear();
             },
             child: Container(
                 padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
-
                 decoration: BoxDecoration(
                   shape: BoxShape.rectangle,
                   color: Colors.red,
-
                   border: Border.all(width: 1.0, color: Colors.red),
                   borderRadius: BorderRadius.all(Radius.circular(10.0)),
                 ),
@@ -83,7 +77,7 @@ class _AddPostState extends State<AddPost> {
           ),
           TextButton(
             style: TextButton.styleFrom(
-                padding: EdgeInsets.fromLTRB(5,5,5,5),
+                padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
                 minimumSize: Size(50, 30),
                 alignment: Alignment.centerLeft),
             onPressed: () async {
@@ -95,7 +89,6 @@ class _AddPostState extends State<AddPost> {
                 padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
                 decoration: BoxDecoration(
                   shape: BoxShape.rectangle,
-
                   border: Border.all(width: 1.0, color: Colors.white),
                   borderRadius: BorderRadius.all(Radius.circular(10.0)),
                 ),
@@ -118,21 +111,32 @@ class _AddPostState extends State<AddPost> {
               ],
             ),
           ),
-
           Container(
             child: Column(
               children: [
                 HtmlEditor(
                   controller: controller,
                   htmlEditorOptions: HtmlEditorOptions(
+
                     hint: '내용을 입력해주세요',
                     shouldEnsureVisible: true,
                     //initialText: "<p>text content initial, if any</p>",
                   ),
                   htmlToolbarOptions: HtmlToolbarOptions(
+
+                    defaultToolbarButtons: [
+
+                      FontSettingButtons(),
+                      InsertButtons(),
+                      FontButtons(),
+                      ColorButtons(),
+                      ParagraphButtons(),
+
+
+                    ],
                     toolbarPosition: ToolbarPosition.aboveEditor,
                     //by default
-                    toolbarType: ToolbarType.nativeScrollable,
+                    toolbarType: ToolbarType.nativeGrid,
                     //by default
                     onButtonPressed: (ButtonType type, bool status,
                         Function() updateStatus) {
@@ -159,7 +163,7 @@ class _AddPostState extends State<AddPost> {
                       return true;
                     },
                   ),
-                  otherOptions: OtherOptions(height: 300),
+                  otherOptions: OtherOptions(height: 500),
                   callbacks: Callbacks(onBeforeCommand: (String currentHtml) {
                     print('html before change is $currentHtml');
                   }, onChange: (String changed) {
@@ -225,7 +229,6 @@ class _AddPostState extends State<AddPost> {
                         }),
                   ],
                 ),
-
               ],
             ),
           ),
@@ -249,46 +252,6 @@ class _AddPostState extends State<AddPost> {
                     : "선택 안 하기");
               },
               isExpanded: true,
-            ),
-          ),
-          Container(
-            child: Row(
-              children: [
-                Text('게시판'),
-                SizedBox(
-                  width: 20,
-                ),
-                Expanded(
-                  child: Container(
-                    child: DropdownButton(
-                      hint: category == null
-                          ? Text('게시판을 선택해주세요')
-                          : Text(
-                              category,
-                              style: TextStyle(color: Colors.blue),
-                            ),
-                      isExpanded: true,
-                      iconSize: 30.0,
-                      style: TextStyle(color: Colors.blue),
-                      items: ['국내주식', '해외주식', '자유게시판'].map(
-                        (val) {
-                          return DropdownMenuItem<String>(
-                            value: val,
-                            child: Text(val),
-                          );
-                        },
-                      ).toList(),
-                      onChanged: (val) {
-                        setState(
-                          () {
-                            category = val;
-                          },
-                        );
-                      },
-                    ),
-                  ),
-                ),
-              ],
             ),
           ),
           SizedBox(
@@ -332,13 +295,7 @@ class _AddPostState extends State<AddPost> {
     var str = DateFormat("yyyy-MM-ddTHH:mm:ss").format(now);
     print(str);
     print(now);
-    if (category == "국내주식") {
-      category = "D";
-    } else if (category == "해외주식")
-      category = "F";
-    else {
-      category = "R";
-    }
+    category = "F";
     final responseerw = await http.post(
         Uri.http('13.125.62.90', "api/v1/BlogPosts/"),
         headers: {

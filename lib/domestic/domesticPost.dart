@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/search/searchpage.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'domesticsearchpage.dart';
+
 import 'dart:async';
-import 'package:back_button_interceptor/back_button_interceptor.dart';
+
 import 'addPost.dart';
 import 'domesticDetail.dart';
-import 'package:flutter_app/Navigatior/postTab.dart';
+
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:provider/provider.dart';
+
 import 'package:intl/intl.dart';
 
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -23,7 +22,7 @@ class _DomesticPostState extends State<DomesticPost>
     with AutomaticKeepAliveClientMixin<DomesticPost> {
 
   final BannerAd myBanner = BannerAd(
-    adUnitId: BannerAd.testAdUnitId, //자신의 UnitID
+    adUnitId: 'ca-app-pub-6925657557995580/4217243070', //자신의 UnitID
     size: AdSize.banner,
     request: AdRequest(),
     listener: AdListener(),
@@ -266,7 +265,7 @@ class _DomesticPostState extends State<DomesticPost>
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) =>SearchPage()
+                    builder: (context) =>DomesticSearchPage()
                 )
             );
           })

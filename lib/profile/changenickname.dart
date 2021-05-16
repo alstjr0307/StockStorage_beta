@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'dart:io';
 
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:flutter_app/realhome.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ChangeNickname extends StatefulWidget {

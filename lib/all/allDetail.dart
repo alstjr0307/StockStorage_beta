@@ -2,18 +2,15 @@ import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
+
 import 'package:flutter/widgets.dart';
-import 'package:flutter_app/all/allpost.dart';
+
 import 'package:flutter_app/search/writerpost.dart';
 
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
-import '../model.dart';
-import 'package:flutter_html/flutter_html.dart';
-import 'package:html/dom.dart' as dom;
-import 'package:html/parser.dart';
+
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';

@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/all/allDetail.dart';
+
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-class SearchPage extends StatefulWidget {
+
+import 'ForeignDetail.dart';
+class ForeignSearchPage extends StatefulWidget {
   @override
-  _SearchPageState createState() => _SearchPageState();
+  _ForeignSearchPageState createState() => _ForeignSearchPageState();
 }
 
-class _SearchPageState extends State<SearchPage> {
+class _ForeignSearchPageState extends State<ForeignSearchPage> {
   var searchController = TextEditingController();
   var searchOption = '제목+내용';
   final BannerAd myBanner = BannerAd(
-    adUnitId: BannerAd.testAdUnitId, //자신의 UnitID
+    adUnitId: 'ca-app-pub-6925657557995580/7912396767', //자신의 UnitID
     size: AdSize.banner,
     request: AdRequest(),
     listener: AdListener(),
@@ -35,7 +37,7 @@ class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text('검색')),
+        appBar: AppBar(title: Text('해외주식게시판 검색')),
         body: Column(
           children: [
             _SearchSection(),
@@ -71,7 +73,7 @@ class _SearchPageState extends State<SearchPage> {
             iconSize: 30.0,
             style: TextStyle(color: Colors.blue),
             items: ['제목', '내용', '제목+내용'].map(
-              (val) {
+                  (val) {
                 return DropdownMenuItem<String>(
                   value: val,
                   child: Text(val),
@@ -80,7 +82,7 @@ class _SearchPageState extends State<SearchPage> {
             ).toList(),
             onChanged: (val) {
               setState(
-                () {
+                    () {
                   searchOption = val;
                 },
               );
@@ -128,7 +130,7 @@ class _SearchPageState extends State<SearchPage> {
         isLoading = true;
       });
 
-      var url = "http://13.125.62.90/api/v1/BlogPosts/?contentsearch=${searchController.text}&page=" +
+      var url = "http://13.125.62.90/api/v1/BlogPosts/?category=F&contentsearch=${searchController.text}&page=" +
           (index + 1).toString();
       print(url);
       final response = await dio.get(url);
@@ -167,7 +169,7 @@ class _SearchPageState extends State<SearchPage> {
         isLoading = true;
       });
 
-      var url = "http://13.125.62.90/api/v1/BlogPosts/?titlesearch=${searchController.text}&page=" +
+      var url = "http://13.125.62.90/api/v1/BlogPosts/?category=F&titlesearch=${searchController.text}&page=" +
           (index + 1).toString();
       print(url);
       final response = await dio.get(url);
@@ -206,7 +208,7 @@ class _SearchPageState extends State<SearchPage> {
         isLoading = true;
       });
 
-      var url = "http://13.125.62.90/api/v1/BlogPosts/?multisearch=${searchController.text}&page=" +
+      var url = "http://13.125.62.90/api/v1/BlogPosts/?category=F&multisearch=${searchController.text}&page=" +
           (index + 1).toString();
       print(url);
       final response = await dio.get(url);
@@ -338,7 +340,7 @@ class _SearchPageState extends State<SearchPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => allDetail(
+                            builder: (context) => ForeignDetail(
                               index: posts[index]["id"],
                             ),
                           ),

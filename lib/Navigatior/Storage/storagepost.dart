@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+
 import 'dart:async';
 import 'package:back_button_interceptor/back_button_interceptor.dart';
-import 'storagedetail.dart';
-import 'package:flutter_app/Navigatior/postTab.dart';
+
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:provider/provider.dart';
+
 import 'package:flutter_app/all/allDetail.dart';
 import 'package:intl/intl.dart';
 class StoragePost extends StatefulWidget {
@@ -76,7 +74,7 @@ class _StoragePostState extends State<StoragePost>
           "http://13.125.62.90/api/v1/TaggitTaggedItem/?namee=${widget.tag}";
       print(tagitemurl);
       final taggitemresponse = await dio.get(tagitemurl,
-          options: Options(headers: {"Authorization": "Token ${token}"}));
+          );
       print(taggitemresponse.data);
       print(taggitemresponse.data.length);
       for (var i = 0; i < taggitemresponse.data.length; i++) {
@@ -93,8 +91,7 @@ class _StoragePostState extends State<StoragePost>
         var url = "http://13.125.62.90/api/v1/BlogPosts/?id_in=${idlist}&page=" +
             (index + 1).toString();
 
-        final response = await dio.get(url,
-            options: Options(headers: {"Authorization": "Token ${token}"}));
+        final response = await dio.get(url);
         maxpage = response.data['count'] ~/ 10 + 1;
         print('중간까지됨');
         tList = [];

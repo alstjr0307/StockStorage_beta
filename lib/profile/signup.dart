@@ -1,11 +1,9 @@
-import 'package:flutter/material.dart';
-import 'dart:io';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
 import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:flutter_app/realhome.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class SignUp extends StatefulWidget {
   @override
@@ -30,8 +28,8 @@ class _State extends State<SignUp> {
       "first_name": nickname
     };
 
-    var response = await http.post(Uri.http("13.125.62.90", "api/v2/auth/users/"),
-        body: data);
+    var response = await http
+        .post(Uri.http("13.125.62.90", "api/v2/auth/users/"), body: data);
 
     print(response.statusCode);
     if (response.statusCode == 201) {
@@ -47,7 +45,7 @@ class _State extends State<SignUp> {
             builder: (context) {
               return AlertDialog(
                 title: Text('회원가입 성공'),
-                content: Text("환영합니다 $username 님"),
+                content: Text("환영합니다 $username 님, 이메일 인증을 받아주세요"),
                 actions: [
                   FlatButton(
                       onPressed: () {
@@ -60,7 +58,21 @@ class _State extends State<SignUp> {
       });
     }
     if (response.statusCode == 400) {
-      print(response.body);
+      var json = jsonDecode(utf8.decode(response.bodyBytes));
+      var message = [];
+      json.forEach((final String key, final value) {
+        print(value);
+        if (json[key][0] == "A user with that username already exists.") {
+          print(key);
+          json["$key"][0] = "아이디가 이미 존재합니다";
+        }
+        if (json[key][0] =="This field may not be blank." && key=="password") {
+          json[key][0] = "비밀번호를 입력해주세요";
+        }
+      });
+
+      print(json['email']);
+      print(json);
       setState(() {
         _isLoading = false;
         errormsg = Card(
@@ -68,13 +80,15 @@ class _State extends State<SignUp> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              ListTile(
-                leading: Icon(Icons.error, size: 50),
-                title: Text(
-                  '잘못된 입력입니다',
-                  style: TextStyle(color: Colors.white),
+              for (var value in json.values)
+                ListTile(
+                  minVerticalPadding: 0,
+                  leading: Icon(Icons.error, size: 50),
+                  title: Text(
+                    value[0],
+                    style: TextStyle(color: Colors.white, fontSize: 15),
+                  ),
                 ),
-              ),
             ],
           ),
         );
@@ -99,7 +113,7 @@ class _State extends State<SignUp> {
                       alignment: Alignment.center,
                       padding: EdgeInsets.all(10),
                       child: Text(
-                        '회원가입',
+                        '주식저장소 회원가입',
                         style: TextStyle(
                             color: Colors.blue,
                             fontWeight: FontWeight.w500,
@@ -108,15 +122,16 @@ class _State extends State<SignUp> {
                   Container(
                     padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
                     child: TextField(
+                      maxLength: 15,
+
                       controller: usernameController,
+                      inputFormatters: [new WhitelistingTextInputFormatter(RegExp("[a-zA-Z0-9]")),],
                       decoration: InputDecoration(
                         border: OutlineInputBorder(),
+                        hintText: '(15자이내 영문+숫자)',
                         labelText: '아이디',
                       ),
                     ),
-                  ),
-                  SizedBox(
-                    height: 30,
                   ),
                   Container(
                     padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
@@ -128,9 +143,7 @@ class _State extends State<SignUp> {
                       ),
                     ),
                   ),
-                  SizedBox(
-                    height: 30,
-                  ),
+
                   Container(
                     padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
                     child: TextField(
@@ -141,9 +154,7 @@ class _State extends State<SignUp> {
                       ),
                     ),
                   ),
-                  SizedBox(
-                    height: 30,
-                  ),
+
                   Container(
                     padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
                     child: TextField(
@@ -154,24 +165,24 @@ class _State extends State<SignUp> {
                       ),
                     ),
                   ),
-                  SizedBox(
-                    height: 30,
-                  ),
+
                   Container(
                     padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
                     child: TextField(
+                      maxLength: 6,
+                      inputFormatters: [new WhitelistingTextInputFormatter(RegExp("[a-zA-Z0-9ㄱ-ㅎㅏ-ㅣ가-힣]")),],
                       controller: nicknameController,
                       decoration: InputDecoration(
+                        hintText: '(한글, 영어, 숫자 가능, 6자 이내)',
+
                         border: OutlineInputBorder(),
                         labelText: '닉네임',
                       ),
                     ),
                   ),
-                  SizedBox(
-                    height: 30,
-                  ),
+
                   Container(
-                    height: 50,
+                    height: 40,
                     padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
                     child: RaisedButton(
                       textColor: Colors.white,
@@ -181,6 +192,7 @@ class _State extends State<SignUp> {
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       onPressed: () {
+
                         if (passwordController.text ==
                             passwordConfirmController.text) {
                           setState(() {
@@ -188,7 +200,9 @@ class _State extends State<SignUp> {
                           });
                           sign(emailController.text, usernameController.text,
                               passwordController.text, nicknameController.text);
-                        } else {
+                        }
+                          else
+                        {
                           errormsg = Card(
                             color: Colors.red,
                             child: Column(
@@ -197,8 +211,9 @@ class _State extends State<SignUp> {
                                 ListTile(
                                   leading: Icon(Icons.error, size: 50),
                                   title: Text(
-                                    '새 비밀번호가 일치하지 않습니다',
-                                    style: TextStyle(color: Colors.white),
+                                    ' 비밀번호가 일치하지 않습니다',
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 13),
                                   ),
                                 ),
                               ],

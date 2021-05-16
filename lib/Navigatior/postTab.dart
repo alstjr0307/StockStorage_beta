@@ -3,9 +3,7 @@ import 'package:flutter_app/all/allpost.dart';
 import 'package:flutter_app/domestic/domesticPost.dart';
 import 'package:flutter_app/foreign/ForeignPost.dart';
 import 'package:flutter_app/free/freePost.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'dart:async';
+
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 class Post extends StatefulWidget {

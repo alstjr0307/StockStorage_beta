@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+
 import 'dart:async';
-import 'package:back_button_interceptor/back_button_interceptor.dart';
+
 import 'package:flutter_app/all/allDetail.dart';
-import 'package:flutter_app/Navigatior/postTab.dart';
+
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:provider/provider.dart';
+
 import 'package:intl/intl.dart';
-import 'package:flutter_app/all/addPost.dart';
+
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class AllSearch extends StatefulWidget {
