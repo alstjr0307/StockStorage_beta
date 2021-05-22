@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 import 'package:http/http.dart' as http;
@@ -56,7 +58,28 @@ class _State extends State<ChangePassword> {
       );
     }
     if (response.statusCode == 400) {
-      print(response.body);
+      var json = jsonDecode(utf8.decode(response.bodyBytes));
+      var message = [];
+      json.forEach((final String key, final value) {
+        print(value);
+        if (json[key][0] == "This password is too short. It must contain at least 8 characters.") {
+          print(key);
+          json["$key"][0] = "비밀번호를 8자 이상으로 설정해주세요";
+        }
+        if (json[key][0] =="This password is too common.") {
+          json[key][0] = "비밀번호가 너무 평범합니다";
+        }
+        if (json[key][0] =="The password is too similar to the username.") {
+          json[key][0] = "비밀번호가 아이디와 너무 유사합니다";
+        }
+        if (json[key][0] =="The password is too similar to the email address.") {
+          json[key][0] = "비밀번호가 이메일과 너무 유사합니다";
+        }
+        if (json[key][0] =="Invalid password.") {
+          json[key][0] = "현재 비밀번호를 확인해주세요";
+        }
+      });
+
       setState(() {
         _isLoading = false;
         errormsg = Card(
@@ -64,13 +87,15 @@ class _State extends State<ChangePassword> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              ListTile(
-                leading: Icon(Icons.error, size: 50),
-                title: Text(
-                  '잘못된 입력입니다',
-                  style: TextStyle(color: Colors.white),
+              for (var value in json.values)
+                ListTile(
+                  minVerticalPadding: 0,
+                  leading: Icon(Icons.error, size: 50),
+                  title: Text(
+                    value[0],
+                    style: TextStyle(color: Colors.white, fontSize: 15),
+                  ),
                 ),
-              ),
             ],
           ),
         );

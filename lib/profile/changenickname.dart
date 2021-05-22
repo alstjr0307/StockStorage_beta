@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:http/http.dart' as http;
 
@@ -105,9 +106,10 @@ class _State extends State<ChangeNickname> {
             Container(
               padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
               child: TextField(
-
+                inputFormatters: [new WhitelistingTextInputFormatter(RegExp("[a-zA-Z0-9ㄱ-ㅎㅏ-ㅣ가-힣]")),],
                 controller: nicknameController,
                 decoration: InputDecoration(
+                  hintText: '(한글, 영어, 숫자 가능, 6자 이내)',
                   border: OutlineInputBorder(),
                   labelText: '새 닉네임',
                 ),

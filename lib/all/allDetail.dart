@@ -43,13 +43,16 @@ class _allDetailState extends State<allDetail> {
   var sharedPreferences;
   var token;
   var userid;
-
+  var likecount;
+  Future _future;
   //백버튼 작용
   @override
   initState() {
-    checkLikes();
 
     super.initState();
+    checkLikes();
+    _future= getPostData(widget.index, content);
+
     print(whether_like);
     BackButtonInterceptor.add(myInterceptor);
   }
@@ -88,6 +91,7 @@ class _allDetailState extends State<allDetail> {
   }
 
   checkLikes() async {
+    print('체크');
     sharedPreferences = await SharedPreferences.getInstance();
     token = sharedPreferences.getString("token");
     userid = sharedPreferences.getInt("userID");
@@ -123,6 +127,8 @@ class _allDetailState extends State<allDetail> {
     print(likeresponse.body);
     print(likeresponse.statusCode);
     whether_like = true;
+    likecount=likecount+1;
+    print('버튼'+likecount.toString());
 
     if (likeresponse.statusCode == 400) {
       final likeresponsee = await http.get(
@@ -135,7 +141,7 @@ class _allDetailState extends State<allDetail> {
           "Content-Type": "application/json"
         },
       );
-
+      likecount=likecount-2;
       var a = jsonDecode(likeresponsee.body);
       print('body : ${a}');
       print(a[0]['id']);
@@ -151,7 +157,9 @@ class _allDetailState extends State<allDetail> {
       print('취소 ${likeresponseee.body}');
 
       whether_like = false;
+
     }
+
   }
 
   @override
@@ -164,8 +172,9 @@ class _allDetailState extends State<allDetail> {
         }
       },
       child: FutureBuilder(
-        future: getPostData(widget.index, content),
+        future: _future,
         builder: (context, snapshot) {
+
           if (snapshot.hasError)
             return Scaffold(body: Center(child: Text('게시물이 존재하지 않습니다')));
           else if (!snapshot.hasData)
@@ -176,6 +185,8 @@ class _allDetailState extends State<allDetail> {
               )),
             );
           else {
+            if (likecount ==null) likecount = snapshot.data['likes'];
+            print('라이크카운트'+likecount.toString());
             return Scaffold(
               appBar: AppBar(
                 title: Text(snapshot.data['title']),
@@ -296,11 +307,7 @@ class _allDetailState extends State<allDetail> {
                                                   Icon(Icons.thumb_up,
                                                       size: 13,
                                                       color: Colors.red),
-                                                  Text(
-                                                      snapshot.data['likes']
-                                                          .toString(),
-                                                      style: TextStyle(
-                                                          color: Colors.red)),
+                                                 LikeCount(likecount),
                                                   SizedBox(width: 10),
                                                   Icon(Icons.comment,
                                                       size: 13,
@@ -322,7 +329,9 @@ class _allDetailState extends State<allDetail> {
                                                 child: OutlinedButton.icon(
                                                   onPressed: () async {
                                                     await doLikes();
-                                                    setState(() {});
+                                                    setState(() {
+
+                                                    });
                                                   },
                                                   icon: Icon(
                                                     Icons.thumb_up,
@@ -553,5 +562,8 @@ class _allDetailState extends State<allDetail> {
         },
       ),
     );
+  }
+  Widget LikeCount(int like) { //추천 갯수 업데이트하기위함
+    return Text(like.toString());
   }
 }

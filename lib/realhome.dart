@@ -56,7 +56,7 @@ class _RealHomeState extends State<RealHome> {
   var freeList = [];
   final dio = new Dio();
   var popularTag = [];
-
+  Future _future;
   var result;
   ScrollController _scrollController = new ScrollController();
 
@@ -71,7 +71,18 @@ class _RealHomeState extends State<RealHome> {
   @override
   void initState() {
     super.initState();
+    _future = getPostAll();
     checkLoginStatus();
+    Timer.periodic(Duration(seconds: 3), (timer) {
+
+      _scrollController.animateTo(
+        (timer.tick % 6) *
+            _scrollController.position.maxScrollExtent /
+            (output.length - 1),
+        curve: Curves.easeInCubic,
+        duration: const Duration(milliseconds: 300),
+      );
+    });
   }
 
   @override
@@ -139,16 +150,7 @@ class _RealHomeState extends State<RealHome> {
     output = map.keys.toList(growable: false);
     output.sort((k1, k2) => map[k2].compareTo(map[k1]));
     print(output);
-    Timer.periodic(Duration(seconds: 3), (timer) {
 
-      _scrollController.animateTo(
-        (timer.tick % 6) *
-            _scrollController.position.maxScrollExtent /
-            (output.length - 1),
-        curve: Curves.easeInCubic,
-        duration: const Duration(milliseconds: 300),
-      );
-    });
     allList = responseall.data['results'];
     print('중간');
     forList = responsefor.data['results'];
@@ -377,7 +379,7 @@ class _RealHomeState extends State<RealHome> {
   @override
   Widget build(BuildContext cont) {
     return FutureBuilder(
-        future: getPostAll(),
+        future: _future,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return Scaffold(
