@@ -314,22 +314,32 @@ class _RealHomeState extends State<RealHome> {
                             hintStyle: new TextStyle(color: Colors.white)),
                       ),
                     ),
-                    new IconButton(
-                        icon: Icon(Icons.arrow_right_alt),
-                        onPressed: () {
-                          setState(() {
-                            this.actionIcon = new Icon(Icons.search);
-                            this.appBarTitle = new Text("주식 저장소 홈", style:TextStyle(fontFamily: 'gyeongi'));
-                          });
+                    Container(
+                      padding: EdgeInsets.all(0),
+                      decoration: BoxDecoration(
 
-                          if (searchcontroller.text != '') {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => AllSearch(
-                                        search: searchcontroller.text)));
-                          }
-                        })
+                        color: Colors.red,
+                        shape: BoxShape.circle
+                    ),
+
+                      child: new IconButton(
+
+                          icon: Icon(Icons.arrow_right_alt,),
+                          onPressed: () {
+                            setState(() {
+                              this.actionIcon = new Icon(Icons.search);
+                              this.appBarTitle = new Text("주식 저장소 홈", style:TextStyle(fontFamily: 'gyeongi'));
+                            });
+
+                            if (searchcontroller.text != '') {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => AllSearch(
+                                          search: searchcontroller.text)));
+                            }
+                          }),
+                    )
                   ],
                 );
               } else {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/search/domesticsearchpage.dart';
 import 'package:flutter_app/search/searchpage.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -266,7 +267,7 @@ class _DomesticPostState extends State<DomesticPost>
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) =>SearchPage()
+                    builder: (context) =>DomesticSearchPage()
                 )
             );
           })
