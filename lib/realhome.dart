@@ -1,29 +1,31 @@
+
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/search/allsearch.dart';
-import 'package:flutter_app/search/titlesearch.dart';
+import 'domestic/domesticDetail.dart';
+import 'foreign/ForeignDetail.dart';
+import 'foreign/ForeignPost.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:http/http.dart' as http;
-import 'package:yahoofin/yahoofin.dart';
-import 'package:flutter_search_bar/flutter_search_bar.dart';
-import 'dart:convert';
+
+
 import 'dart:async';
 import 'all/allDetail.dart';
-import 'package:back_button_interceptor/back_button_interceptor.dart';
+
 import 'all/allpost.dart';
-import 'package:flutter_app/Navigatior/postTab.dart';
+
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
+
+
+import 'free/freeDetail.dart';
 import 'profile/profile.dart';
-import 'package:flex_color_scheme/flex_color_scheme.dart';
+
 import 'profile/loginpage.dart';
 import 'domestic/domesticPost.dart';
-import 'foreign/ForeignPost.dart';
+
 import 'free/freePost.dart';
 import 'Navigatior/Storage/storage.dart';
-import 'package:flutter_app/Widget/Search.dart';
 
 class RealHome extends StatefulWidget {
   final List<String> list = List.generate(10, (index) => "Text $index");
@@ -45,6 +47,7 @@ class _RealHomeState extends State<RealHome> {
     FreePost(),
     Storage()
   ];
+  var output;
   var username;
   var sharedPreferences;
   var allList = [];
@@ -52,10 +55,13 @@ class _RealHomeState extends State<RealHome> {
   var domList = [];
   var freeList = [];
   final dio = new Dio();
+  var popularTag = [];
+  Future _future;
+  var result;
+  ScrollController _scrollController = new ScrollController();
 
   checkLoginStatus() async {
     sharedPreferences = await SharedPreferences.getInstance();
-    print('1');
     if (sharedPreferences.getString("token") != null) {
       username = sharedPreferences.getString("nickname");
     }
@@ -65,13 +71,25 @@ class _RealHomeState extends State<RealHome> {
   @override
   void initState() {
     super.initState();
+    _future = getPostAll();
     checkLoginStatus();
+    Timer.periodic(Duration(seconds: 3), (timer) {
+
+      _scrollController.animateTo(
+        (timer.tick % 6) *
+            _scrollController.position.maxScrollExtent /
+            (output.length - 1),
+        curve: Curves.easeInCubic,
+        duration: const Duration(milliseconds: 300),
+      );
+    });
   }
 
   @override
   void dispose() {
     super.dispose();
     searchcontroller.dispose();
+    _scrollController.dispose();
   }
 
   Future<List> getPostAll() async {
@@ -82,8 +100,15 @@ class _RealHomeState extends State<RealHome> {
     var urlFor = "http://13.125.62.90/api/v1/BlogPosts/?category=F";
     var urldom = "http://13.125.62.90/api/v1/BlogPosts/?category=D";
     var urlfree = "http://13.125.62.90/api/v1/BlogPosts/?category=R";
-
+    var tag = "http://13.125.62.90/api/v1/TaggitTaggedItem/";
     print('중간');
+    final responsetag = await dio.get(tag,
+        options: Options(
+          followRedirects: false,
+          validateStatus: (status) {
+            return status < 500;
+          },
+        ));
     final responseall = await dio.get(urlall,
         options: Options(
           followRedirects: false,
@@ -91,35 +116,40 @@ class _RealHomeState extends State<RealHome> {
             return status < 500;
           },
         ));
-    print('2231');
     print(responseall.statusCode);
-    final responsefor = await dio.get(
-      urlFor,
-      options: Options(
-        followRedirects: false,
-        validateStatus: (status) {
-          return status < 500;
-        },
-      )
-    );
-    final responsedom = await dio.get(
-      urldom,
+    final responsefor = await dio.get(urlFor,
         options: Options(
           followRedirects: false,
           validateStatus: (status) {
             return status < 500;
           },
-        )
-    );
-    final responsefree = await dio.get(
-      urlfree,
+        ));
+    final responsedom = await dio.get(urldom,
         options: Options(
           followRedirects: false,
           validateStatus: (status) {
             return status < 500;
           },
-        )
-    );
+        ));
+    final responsefree = await dio.get(urlfree,
+        options: Options(
+          followRedirects: false,
+          validateStatus: (status) {
+            return status < 500;
+          },
+        ));
+    for (var i = 0; i < 10; i++) {
+      popularTag.add(responsetag.data[i]['name']);
+    }
+    final map = <String, int>{};
+    for (final letter in popularTag) {
+      map[letter] = map.containsKey(letter) ? map[letter] + 1 : 1;
+    }
+
+// Sort the list of the map keys by the map values.
+    output = map.keys.toList(growable: false);
+    output.sort((k1, k2) => map[k2].compareTo(map[k1]));
+    print(output);
 
     allList = responseall.data['results'];
     print('중간');
@@ -129,9 +159,8 @@ class _RealHomeState extends State<RealHome> {
     print(responseall.statusCode);
     if (responseall.statusCode == 200)
       return freeList;
-
     else {
-    return Future.error(responseall.statusCode);
+      return Future.error(responseall.statusCode);
     }
   }
 
@@ -264,7 +293,8 @@ class _RealHomeState extends State<RealHome> {
           // 리스트타일 추가
           for (var i = 0; i < drawerlist.length; i++)
             ListTile(
-              title: Text(drawerlist[i]),
+              hoverColor: Colors.red,
+              title: Text(drawerlist[i], style: TextStyle(fontFamily: 'gyeongi'),),
               onTap: () {
                 setState(() {
                   Navigator.pop(context);
@@ -281,7 +311,7 @@ class _RealHomeState extends State<RealHome> {
   //검색기능
   final searchcontroller = TextEditingController();
   Widget appBarTitle = new Row(children: [
-    Text("주식저장소 홈", style:TextStyle(fontFamily: 'gyeongi')),
+    Text("주식저장소 홈", style: TextStyle(fontFamily: 'gyeongi')),
     Icon(Icons.bar_chart),
   ]);
   Icon actionIcon = new Icon(Icons.search);
@@ -314,38 +344,30 @@ class _RealHomeState extends State<RealHome> {
                             hintStyle: new TextStyle(color: Colors.white)),
                       ),
                     ),
-                    Container(
-                      padding: EdgeInsets.all(0),
-                      decoration: BoxDecoration(
+                    new IconButton(
+                        icon: Icon(Icons.arrow_right_alt),
+                        onPressed: () {
+                          setState(() {
+                            this.actionIcon = new Icon(Icons.search);
+                            this.appBarTitle = new Text("주식 저장소 홈",
+                                style: TextStyle(fontFamily: 'gyeongi'));
+                          });
 
-                        color: Colors.red,
-                        shape: BoxShape.circle
-                    ),
-
-                      child: new IconButton(
-
-                          icon: Icon(Icons.arrow_right_alt,),
-                          onPressed: () {
-                            setState(() {
-                              this.actionIcon = new Icon(Icons.search);
-                              this.appBarTitle = new Text("주식 저장소 홈", style:TextStyle(fontFamily: 'gyeongi'));
-                            });
-
-                            if (searchcontroller.text != '') {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => AllSearch(
-                                          search: searchcontroller.text)));
-                            }
-                          }),
-                    )
+                          if (searchcontroller.text != '') {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => AllSearch(
+                                        search: searchcontroller.text)));
+                          }
+                        })
                   ],
                 );
               } else {
                 print(searchcontroller.text);
                 this.actionIcon = new Icon(Icons.search);
-                this.appBarTitle = new Text("주식 저장소 홈",style:TextStyle(fontFamily: 'gyeongi'));
+                this.appBarTitle = new Text("주식 저장소 홈",
+                    style: TextStyle(fontFamily: 'gyeongi'));
               }
             });
           },
@@ -357,7 +379,7 @@ class _RealHomeState extends State<RealHome> {
   @override
   Widget build(BuildContext cont) {
     return FutureBuilder(
-        future: getPostAll(),
+        future: _future,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return Scaffold(
@@ -367,7 +389,7 @@ class _RealHomeState extends State<RealHome> {
                 padding: const EdgeInsets.all(8.0),
                 child: ListView(
                   children: [
-                    Stock(),
+                    Stock(result, output, context, _scrollController),
                     PostAll(allList, context),
                     PostFor(forList, context),
                     PostDom(domList, context),
@@ -383,25 +405,23 @@ class _RealHomeState extends State<RealHome> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-
-                      Icon(
-                        Icons.error_outline,
-                        color: Colors.red,
-                        size: 60,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 16),
-                        child: Text('데이터를 불러올 수 없습니다.\n인터넷 연결 상태를 확인해주세요'),
-                      ),
-                    TextButton(onPressed: (){
-                      Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                          builder: (context) => RealHome()
-                      ),
-                      );
-                    }, child: Text('재시도')),
-
+                    Icon(
+                      Icons.error_outline,
+                      color: Colors.red,
+                      size: 60,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16),
+                      child: Text('데이터를 불러올 수 없습니다.\n인터넷 연결 상태를 확인해주세요'),
+                    ),
+                    TextButton(
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => RealHome()),
+                          );
+                        },
+                        child: Text('재시도')),
                   ],
                 ),
               ),
@@ -417,19 +437,56 @@ class _RealHomeState extends State<RealHome> {
   }
 }
 
-Widget Stock() {
+Widget Stock(String taglist, List output, BuildContext context,
+    ScrollController _scrollController) {
   return Container(
       child: Card(
           color: Colors.white60,
-          elevation: 3,
-          shadowColor: Colors.blue,
+          elevation: 1,
+          shadowColor: Colors.red,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
                 child: Row(
                   children: [
-                    Text('코스피'),
+                    Text(' 실시간 인기 종목',
+                        style: TextStyle(
+                            fontFamily: 'Hoon',
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20)),
+                    SizedBox(width: 30),
+                    Expanded(
+                      child: Container(
+                        height: 50,
+                        child: ListView.builder(
+                          controller: _scrollController,
+                          physics: PageScrollPhysics(),
+                          // this is what you are looking for
+                          scrollDirection: Axis.vertical,
+                          itemCount: output.length,
+                          itemBuilder: (context, index) {
+                            return Container(
+                              color: Colors.white54,
+                                height: 50,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    TextButton(
+
+                                      child: Text(output[index],
+                                          style: TextStyle(
+                                            fontFamily: 'gyeongi',
+                                              color: Colors.black54,
+                                              fontWeight: FontWeight.w800))
+                                    ),
+                                  ],
+                                ));
+                          },
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               )
@@ -452,7 +509,8 @@ Widget PostAll(List posts, BuildContext context) {
               children: [
                 Text(
                   '최신글',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'gyeongi'),
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, fontFamily: 'gyeongi'),
                 ),
                 TextButton(
                     child: Row(
@@ -518,7 +576,8 @@ Widget PostFor(List posts, BuildContext context) {
               children: [
                 Text(
                   '해외주식',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'gyeongi'),
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, fontFamily: 'gyeongi'),
                 ),
                 TextButton(
                     child: Row(
@@ -532,8 +591,10 @@ Widget PostFor(List posts, BuildContext context) {
                       ],
                     ),
                     onPressed: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => ForeignPost()));
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ForeignPost()));
                     })
               ],
             ),
@@ -554,7 +615,7 @@ Widget PostFor(List posts, BuildContext context) {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => allDetail(
+                              builder: (context) => ForeignDetail(
                                     index: posts[i]['id'],
                                   )));
                     },
@@ -584,7 +645,8 @@ Widget PostDom(List posts, BuildContext context) {
               children: [
                 Text(
                   '국내주식',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'gyeongi'),
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, fontFamily: 'gyeongi'),
                 ),
                 TextButton(
                     child: Row(
@@ -598,8 +660,10 @@ Widget PostDom(List posts, BuildContext context) {
                       ],
                     ),
                     onPressed: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => DomesticPost()));
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => DomesticPost()));
                     })
               ],
             ),
@@ -620,7 +684,7 @@ Widget PostDom(List posts, BuildContext context) {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => allDetail(
+                              builder: (context) => DomesticDetail(
                                     index: posts[i]['id'],
                                   )));
                     },
@@ -650,7 +714,8 @@ Widget PostFree(List posts, BuildContext context) {
               children: [
                 Text(
                   '자유게시판',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'gyeongi'),
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, fontFamily: 'gyeongi'),
                 ),
                 TextButton(
                     child: Row(
@@ -665,7 +730,7 @@ Widget PostFree(List posts, BuildContext context) {
                     ),
                     onPressed: () {
                       Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => AllPost()));
+                          MaterialPageRoute(builder: (context) => FreePost()));
                     })
               ],
             ),
@@ -686,7 +751,7 @@ Widget PostFree(List posts, BuildContext context) {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => allDetail(
+                              builder: (context) => FreeDetail(
                                     index: posts[i]['id'],
                                   )));
                     },

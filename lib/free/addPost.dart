@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
 import 'package:http/http.dart' as http;
-import 'package:searchable_dropdown/searchable_dropdown.dart';
+
 import 'dart:async';
-
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'package:intl/intl.dart';
 import 'dart:convert';
 import 'package:html_editor_enhanced/html_editor.dart';
@@ -191,26 +188,26 @@ class _AddPostState extends State<AddPost> {
                   },*/
                       onImageUploadError: (FileUpload file, String base64Str,
                           UploadError error) {
-                    print(describeEnum(error));
-                    print(base64Str ?? '');
-                    if (file != null) {
-                      print(file.name);
-                      print(file.size);
-                      print(file.type);
-                    }
-                  }, onKeyDown: (int keyCode) {
-                    print('$keyCode key downed');
-                  }, onKeyUp: (int keyCode) {
-                    print('$keyCode key released');
-                  }, onMouseDown: () {
-                    print('mouse downed');
-                  }, onMouseUp: () {
-                    print('mouse released');
-                  }, onPaste: () {
-                    print('pasted into editor');
-                  }, onScroll: () {
-                    print('editor scrolled');
-                  }),
+                        print(describeEnum(error));
+                        print(base64Str ?? '');
+                        if (file != null) {
+                          print(file.name);
+                          print(file.size);
+                          print(file.type);
+                        }
+                      }, onKeyDown: (int keyCode) {
+                        print('$keyCode key downed');
+                      }, onKeyUp: (int keyCode) {
+                        print('$keyCode key released');
+                      }, onMouseDown: () {
+                        print('mouse downed');
+                      }, onMouseUp: () {
+                        print('mouse released');
+                      }, onPaste: () {
+                        print('pasted into editor');
+                      }, onScroll: () {
+                        print('editor scrolled');
+                      }),
                   plugins: [
                     SummernoteAtMention(
                         getSuggestionsMobile: (String value) {
@@ -228,71 +225,6 @@ class _AddPostState extends State<AddPost> {
 
               ],
             ),
-          ),
-          Container(
-            child: SearchableDropdown.multiple(
-              items: items,
-              selectedItems: selectedItems,
-              hint: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Text("종목을 골라주세요"),
-              ),
-              searchHint: "종목 선택",
-              onChanged: (value) {
-                setState(() {
-                  selectedItems = value;
-                });
-              },
-              closeButton: (selectedItems) {
-                return (selectedItems.isNotEmpty
-                    ? "확인 ${selectedItems.length == 1 ? '"' + items[selectedItems.first].value.toString() + '"' : '(' + selectedItems.length.toString() + ')'}"
-                    : "선택 안 하기");
-              },
-              isExpanded: true,
-            ),
-          ),
-          Container(
-            child: Row(
-              children: [
-                Text('게시판'),
-                SizedBox(
-                  width: 20,
-                ),
-                Expanded(
-                  child: Container(
-                    child: DropdownButton(
-                      hint: category == null
-                          ? Text('게시판을 선택해주세요')
-                          : Text(
-                              category,
-                              style: TextStyle(color: Colors.blue),
-                            ),
-                      isExpanded: true,
-                      iconSize: 30.0,
-                      style: TextStyle(color: Colors.blue),
-                      items: ['국내주식', '해외주식', '자유게시판'].map(
-                        (val) {
-                          return DropdownMenuItem<String>(
-                            value: val,
-                            child: Text(val),
-                          );
-                        },
-                      ).toList(),
-                      onChanged: (val) {
-                        setState(
-                          () {
-                            category = val;
-                          },
-                        );
-                      },
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(
-            height: 50,
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -365,15 +297,15 @@ class _AddPostState extends State<AddPost> {
       for (var i = 0; i < selectedItems.length; i++) {
         print(items[selectedItems[i]].value.toString());
         final tagpost =
-            await http.post(Uri.http('13.125.62.90', 'api/v1/TaggitTag/'),
-                headers: {
-                  "Authorization": "Token ${token}",
-                  "Content-Type": "application/json",
-                },
-                body: jsonEncode(<String, dynamic>{
-                  "slug": items[selectedItems[i]].value.toString() + 'z',
-                  "name": items[selectedItems[i]].value.toString()
-                }));
+        await http.post(Uri.http('13.125.62.90', 'api/v1/TaggitTag/'),
+            headers: {
+              "Authorization": "Token ${token}",
+              "Content-Type": "application/json",
+            },
+            body: jsonEncode(<String, dynamic>{
+              "slug": items[selectedItems[i]].value.toString() + 'z',
+              "name": items[selectedItems[i]].value.toString()
+            }));
         if (tagpost.statusCode == 201) {
           var tagid = jsonDecode(tagpost.body)["id"];
           print('태그 새로추가 태그아이디는 ${tagid}');

@@ -1,34 +1,27 @@
 import 'package:flutter/material.dart';
-import 'searchpage.dart';
-import 'dart:async';
-import 'allDetail.dart';
+
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:dio/dio.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:intl/intl.dart';
-import 'addPost.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
-
-class AllPost extends StatefulWidget {
+import 'freeDetail.dart';
+class FreeSearchPage extends StatefulWidget {
   @override
-  _AllPostState createState() => _AllPostState();
+  _FreeSearchPageState createState() => _FreeSearchPageState();
 }
 
-class _AllPostState extends State<AllPost>
-    with AutomaticKeepAliveClientMixin<AllPost> {
-
+class _FreeSearchPageState extends State<FreeSearchPage> {
+  var searchController = TextEditingController();
+  var searchOption = '제목+내용';
   final BannerAd myBanner = BannerAd(
-    adUnitId:'ca-app-pub-6925657557995580/6843406418' , //자신의 UnitID
+    adUnitId: 'ca-app-pub-6925657557995580/3211283165', //자신의 UnitID
     size: AdSize.banner,
     request: AdRequest(),
     listener: AdListener(),
   );
   AdWidget adWidget;
   Container adContainer;
-
-
-
-  ScrollController _sc = new ScrollController();
 
   static int page = 0;
   bool isLoading = false;
@@ -38,48 +31,94 @@ class _AllPostState extends State<AllPost>
   var posttype = '';
   var sharedPreferences;
   var token;
-  @override
-  void initState() {
-    _getMoreData(page);
-    Future(() async => await myBanner.load()).then((_) {
-      if (!mounted) return;
-      setState(() {
-        print('애드완성');
-        adWidget = AdWidget(
-          ad: myBanner,
-        );
-        adContainer = Container(
-          alignment: Alignment.center,
-          child: adWidget,
-          width: myBanner.size.width.toDouble(),
-          height: myBanner.size.height.toDouble(),
-        );
-      });
-    });
-    super.initState();
 
-
-    _sc.addListener(() {
-      if (_sc.position.pixels == _sc.position.maxScrollExtent &&
-          page < maxpage) {
-        _getMoreData(page);
-      }
-    });
-    print('이닛');
-  }
+  ScrollController _sc = new ScrollController();
 
   @override
-  void dispose() {
-
-    _sc.dispose();
-    page = 0;
-    posts = [];
-    isLoading = false;
-    myBanner.dispose();
-    super.dispose();
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(title: Text('자유게시판 검색')),
+        body: Column(
+          children: [
+            _SearchSection(),
+            _buildList(),
+          ],
+        ));
   }
 
-  void _getMoreData(int index) async {
+  Widget _SearchSection() {
+    return Row(
+      children: [
+        new Flexible(
+          child: TextField(
+            autofocus: true,
+            controller: searchController,
+            style: new TextStyle(
+              color: Colors.black,
+            ),
+            decoration: new InputDecoration(
+
+                prefixIcon: new Icon(Icons.search, color: Colors.blue),
+                hintText: '검색어를 입력해주세요',
+                hintStyle: new TextStyle(color: Colors.blue)),
+          ),
+        ),
+        Container(
+
+          child: DropdownButton(
+            hint: Text(
+              searchOption,
+              style: TextStyle(color: Colors.blue),
+            ),
+            iconSize: 30.0,
+            style: TextStyle(color: Colors.blue),
+            items: ['제목', '내용', '제목+내용'].map(
+                  (val) {
+                return DropdownMenuItem<String>(
+                  value: val,
+                  child: Text(val),
+                );
+              },
+            ).toList(),
+            onChanged: (val) {
+              setState(
+                    () {
+                  searchOption = val;
+                },
+              );
+            },
+          ),
+        ),
+        IconButton(icon: Icon(Icons.search), onPressed: () {
+          page = 0;
+          posts = [];
+          isLoading = false;
+          if (searchOption == '제목+내용')
+            _getMoreData(page);
+          else if(searchOption == '제목')
+            _getMoreDataTitle(page);
+          else if(searchOption =='내용')
+            _getMoreDataContent(page);
+
+          _sc.addListener(() {
+            if (_sc.position.pixels == _sc.position.maxScrollExtent &&
+                page < maxpage) {
+              _getMoreData(page);
+            }
+          });
+        })
+      ],
+    );
+  }
+  Future<void> _getData() async {
+    //새로고침을 위한 것
+    setState(() {
+      page = 0;
+      posts = [];
+      _getMoreData(page);
+    });
+  }
+  void _getMoreDataContent(int index) async {
     //데이터 추가하기
     List tList = [];
 
@@ -91,7 +130,7 @@ class _AllPostState extends State<AllPost>
         isLoading = true;
       });
 
-      var url = "http://13.125.62.90/api/v1/BlogPosts/?page=" +
+      var url = "http://13.125.62.90/api/v1/BlogPosts/?category=R&contentsearch=${searchController.text}&page=" +
           (index + 1).toString();
       print(url);
       final response = await dio.get(url);
@@ -118,16 +157,95 @@ class _AllPostState extends State<AllPost>
       });
     }
   }
+  void _getMoreDataTitle(int index) async {
+    //데이터 추가하기
+    List tList = [];
 
-  Future<void> _getData() async {
-    //새로고침을 위한 것
-    setState(() {
-      page = 0;
-      posts = [];
-      _getMoreData(page);
-    });
+    sharedPreferences = await SharedPreferences.getInstance();
+    token = sharedPreferences.getString("token"); //token 값 불러오기
+
+    if (!isLoading) {
+      setState(() {
+        isLoading = true;
+      });
+
+      var url = "http://13.125.62.90/api/v1/BlogPosts/?category=R&titlesearch=${searchController.text}&page=" +
+          (index + 1).toString();
+      print(url);
+      final response = await dio.get(url);
+      maxpage = (response.data['count'] - 1) ~/ 10 + 1;
+      print('맥페${maxpage}');
+      tList = [];
+
+      for (int i = 0; i < response.data['results'].length; i++) {
+        tList.add(response.data['results'][i]);
+        if (response.data['results'][i]['category'] == 'D')
+          tList[i]['type'] = '국내';
+        else if (response.data['results'][i]['category'] == 'F')
+          tList[i]['type'] = '해외';
+        else if (response.data['results'][i]['category'] == 'R')
+          tList[i]['type'] = '자유';
+        tList[i]['time'] = DateFormat("M월dd일 H:m").format(DateTime.parse(tList[i]['create_dt']));
+      }
+
+
+      setState(() {
+        isLoading = false;
+        posts.addAll(tList);
+        page++;
+      });
+    }
   }
+  void _getMoreData(int index) async {
+    //데이터 추가하기
+    List tList = [];
 
+    sharedPreferences = await SharedPreferences.getInstance();
+    token = sharedPreferences.getString("token"); //token 값 불러오기
+
+    if (!isLoading) {
+      setState(() {
+        isLoading = true;
+      });
+
+      var url = "http://13.125.62.90/api/v1/BlogPosts/?category=R&multisearch=${searchController.text}&page=" +
+          (index + 1).toString();
+      print(url);
+      final response = await dio.get(url);
+      maxpage = (response.data['count'] - 1) ~/ 10 + 1;
+      print('맥페${maxpage}');
+      tList = [];
+
+      for (int i = 0; i < response.data['results'].length; i++) {
+        tList.add(response.data['results'][i]);
+        if (response.data['results'][i]['category'] == 'D')
+          tList[i]['type'] = '국내';
+        else if (response.data['results'][i]['category'] == 'F')
+          tList[i]['type'] = '해외';
+        else if (response.data['results'][i]['category'] == 'R')
+          tList[i]['type'] = '자유';
+        tList[i]['time'] = DateFormat("M월dd일 H:m").format(DateTime.parse(tList[i]['create_dt']));
+      }
+
+
+      setState(() {
+        isLoading = false;
+        posts.addAll(tList);
+        page++;
+      });
+    }
+  }
+  Widget _buildProgressIndicator() {
+    return new Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: new Center(
+        child: new Opacity(
+          opacity: isLoading ? 1.0 : 00,
+          child: new CircularProgressIndicator(),
+        ),
+      ),
+    );
+  }
   Widget _buildList() {
     return Expanded(
       child: Container(
@@ -183,7 +301,7 @@ class _AllPostState extends State<AllPost>
                                               SizedBox(width:10),
                                               Icon(Icons.comment, size: 15, color: Colors.redAccent,),
                                               Text(
-                                                 ' ${posts[index]['comment'].toString()}', style: TextStyle(fontSize:12,color: Colors.red)),
+                                                  ' ${posts[index]['comment'].toString()}', style: TextStyle(fontSize:12,color: Colors.red)),
 
                                               SizedBox(width:10),
                                               Icon(Icons.thumb_up, size:15, color: Colors.red,),
@@ -222,7 +340,7 @@ class _AllPostState extends State<AllPost>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => allDetail(
+                            builder: (context) => FreeDetail(
                               index: posts[index]["id"],
                             ),
                           ),
@@ -237,62 +355,4 @@ class _AllPostState extends State<AllPost>
       ),
     );
   }
-
-  Widget _buildProgressIndicator() {
-    return new Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: new Center(
-        child: new Opacity(
-          opacity: isLoading ? 1.0 : 00,
-          child: new CircularProgressIndicator(),
-        ),
-      ),
-    );
-  }
-
-  @override
-  bool get wantKeepAlive => true;
-  Map user;
-  List data;
-  Widget screen;
-
-  @override
-  Widget build(BuildContext context) {
-    super.build(context);
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('최신글'),
-        actions: [
-          if (token !=null)
-          IconButton(icon: Icon(Icons.add), onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>AddPost()
-              )
-            );
-
-          }),
-          IconButton(icon: Icon(Icons.search), onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>SearchPage()
-                )
-            );
-          })
-        ],
-      ),
-
-      body: Column(
-        children: [
-          adContainer ?? Container(),
-
-          _buildList(),
-        ],
-      ),
-    );
-  }
-
 }

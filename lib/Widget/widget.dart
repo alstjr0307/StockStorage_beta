@@ -130,6 +130,7 @@ Widget commentList(List comment_set, int count, int userId, String token) {
 Future<Map> getPostData(int postId, Map content) async {
   var sharedPreferences = await SharedPreferences.getInstance();
   var token = sharedPreferences.getString("token");
+
   print( '포스트 $postId');
   final response = await http.get(
     Uri.http('13.125.62.90', "api/v1/BlogPosts/${postId}/"),
@@ -148,7 +149,6 @@ Future<Map> getPostData(int postId, Map content) async {
     for (var i in content['blogpostcomment_set']) {
       i['time'] = DateFormat("M월dd일 H:m").format(DateTime.parse(i['created']));
     }
-
     return content;
   } else {
     // 만약 응답이 OK가 아니면, 에러를 던집니다.

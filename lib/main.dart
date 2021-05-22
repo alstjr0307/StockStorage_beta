@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/all/allDetail.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+
 import 'profile/loginpage.dart';
-import 'package:http/http.dart' as http;
+
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
-import 'dart:async';
-import 'model.dart';
-import 'all/allpost.dart';
-import 'home.dart';
+
 
 import 'realhome.dart';
-import 'Navigatior/Storage/storage.dart';
+
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  MobileAds.instance.initialize();
   runApp(MyApp());
 }
 
