@@ -149,6 +149,7 @@ Future<Map> getPostData(int postId, Map content) async {
     for (var i in content['blogpostcomment_set']) {
       i['time'] = DateFormat("M월dd일 H:m").format(DateTime.parse(i['created']));
     }
+
     return content;
   } else {
     // 만약 응답이 OK가 아니면, 에러를 던집니다.

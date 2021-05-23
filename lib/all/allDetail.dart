@@ -25,7 +25,9 @@ class allDetail extends StatefulWidget {
   _allDetailState createState() => _allDetailState();
 }
 
-class _allDetailState extends State<allDetail> {
+class _allDetailState extends State<allDetail> with AutomaticKeepAliveClientMixin<allDetail> {
+  @override
+  bool get wantKeepAlive => true;
   final TextEditingController commentController = TextEditingController();
   Map content;
   ScrollController _sc = new ScrollController();
@@ -48,10 +50,10 @@ class _allDetailState extends State<allDetail> {
   //백버튼 작용
   @override
   initState() {
+    _future= getPostData(widget.index, content);
 
     super.initState();
     checkLikes();
-    _future= getPostData(widget.index, content);
 
     print(whether_like);
     BackButtonInterceptor.add(myInterceptor);
@@ -164,6 +166,7 @@ class _allDetailState extends State<allDetail> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     FocusScopeNode currentFocus = FocusScope.of(context);
     return GestureDetector(
       onTap: () {
@@ -186,7 +189,6 @@ class _allDetailState extends State<allDetail> {
             );
           else {
             if (likecount ==null) likecount = snapshot.data['likes'];
-            print('라이크카운트'+likecount.toString());
             return Scaffold(
               appBar: AppBar(
                 title: Text(snapshot.data['title']),
