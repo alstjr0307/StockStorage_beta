@@ -4,12 +4,12 @@ import 'dart:async';
 
 
 import 'package:dio/dio.dart';
+import 'package:flutter_app/all/allDetail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
-import 'freeDetail.dart';
 import 'addPost.dart';
 import 'freesearchpage.dart';
 class FreePost extends StatefulWidget {
@@ -93,7 +93,7 @@ class _FreePostState extends State<FreePost>
         isLoading = true;
       });
 
-      var url = "http://13.125.62.90/api/v1/BlogPosts/?category=F&page=" +
+      var url = "http://13.125.62.90/api/v1/BlogPostsList/?category=F&page=" +
           (index + 1).toString();
       print('url'+url);
       final response = await dio.get(url);
@@ -208,7 +208,7 @@ class _FreePostState extends State<FreePost>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => FreeDetail(
+                            builder: (context) => allDetail(
                               index: posts[index]["id"],
                             ),
                           ),

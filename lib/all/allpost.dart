@@ -91,7 +91,7 @@ class _AllPostState extends State<AllPost>
         isLoading = true;
       });
 
-      var url = "http://13.125.62.90/api/v1/BlogPosts/?page=" +
+      var url = "http://13.125.62.90/api/v1/BlogPostsList/?page=" +
           (index + 1).toString();
       print(url);
       final response = await dio.get(url);

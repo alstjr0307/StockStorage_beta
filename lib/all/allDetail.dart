@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter/widgets.dart';
+import 'package:flutter_app/Navigatior/Storage/storagepost.dart';
 
 import 'package:flutter_app/search/writerpost.dart';
 
@@ -20,12 +21,12 @@ class allDetail extends StatefulWidget {
   final int index;
 
   const allDetail({Key key, this.index}) : super(key: key); //index = 게시물 번호
-
   @override
   _allDetailState createState() => _allDetailState();
 }
 
-class _allDetailState extends State<allDetail> with AutomaticKeepAliveClientMixin<allDetail> {
+class _allDetailState extends State<allDetail>
+    with AutomaticKeepAliveClientMixin<allDetail> {
   @override
   bool get wantKeepAlive => true;
   final TextEditingController commentController = TextEditingController();
@@ -47,14 +48,13 @@ class _allDetailState extends State<allDetail> with AutomaticKeepAliveClientMixi
   var userid;
   var likecount;
   Future _future;
+
   //백버튼 작용
   @override
   initState() {
-    _future= getPostData(widget.index, content);
-
     super.initState();
     checkLikes();
-
+    _future = getPostData(widget.index, content);
     print(whether_like);
     BackButtonInterceptor.add(myInterceptor);
   }
@@ -88,12 +88,16 @@ class _allDetailState extends State<allDetail> with AutomaticKeepAliveClientMixi
           'updated': formatter.format(now),
           'content': comment
         }));
-    print('댓글달기' + likeresponse.body);
+
+    _future = getPostData(widget.index, content);
+
     setState(() {});
+    Timer(Duration(milliseconds: 500), () {
+      _sc.jumpTo(_sc.position.maxScrollExtent);
+    });
   }
 
   checkLikes() async {
-    print('체크');
     sharedPreferences = await SharedPreferences.getInstance();
     token = sharedPreferences.getString("token");
     userid = sharedPreferences.getInt("userID");
@@ -108,7 +112,6 @@ class _allDetailState extends State<allDetail> with AutomaticKeepAliveClientMixi
       whether_like = false;
     else
       whether_like = true;
-    print(whether_like);
   }
 
   Future<void> doLikes() async {
@@ -125,12 +128,8 @@ class _allDetailState extends State<allDetail> with AutomaticKeepAliveClientMixi
           'post': widget.index.toInt(),
           'user': sharedPreferences.getInt("userID"),
         }));
-
-    print(likeresponse.body);
-    print(likeresponse.statusCode);
     whether_like = true;
-    likecount=likecount+1;
-    print('버튼'+likecount.toString());
+    likecount = likecount + 1;
 
     if (likeresponse.statusCode == 400) {
       final likeresponsee = await http.get(
@@ -143,10 +142,8 @@ class _allDetailState extends State<allDetail> with AutomaticKeepAliveClientMixi
           "Content-Type": "application/json"
         },
       );
-      likecount=likecount-2;
+      likecount = likecount - 2;
       var a = jsonDecode(likeresponsee.body);
-      print('body : ${a}');
-      print(a[0]['id']);
 
       final likeresponseee = await http.delete(
         Uri.http('13.125.62.90', "api/v1/BlogPostsLikes/${a[0]['id']}/"),
@@ -156,12 +153,8 @@ class _allDetailState extends State<allDetail> with AutomaticKeepAliveClientMixi
         },
       );
 
-      print('취소 ${likeresponseee.body}');
-
       whether_like = false;
-
     }
-
   }
 
   @override
@@ -177,7 +170,6 @@ class _allDetailState extends State<allDetail> with AutomaticKeepAliveClientMixi
       child: FutureBuilder(
         future: _future,
         builder: (context, snapshot) {
-
           if (snapshot.hasError)
             return Scaffold(body: Center(child: Text('게시물이 존재하지 않습니다')));
           else if (!snapshot.hasData)
@@ -188,7 +180,7 @@ class _allDetailState extends State<allDetail> with AutomaticKeepAliveClientMixi
               )),
             );
           else {
-            if (likecount ==null) likecount = snapshot.data['likes'];
+            if (likecount == null) likecount = snapshot.data['likes'];
             return Scaffold(
               appBar: AppBar(
                 title: Text(snapshot.data['title']),
@@ -199,7 +191,6 @@ class _allDetailState extends State<allDetail> with AutomaticKeepAliveClientMixi
                         await showDialog(
                           context: context,
                           builder: (BuildContext context) {
-                            print(snapshot.data['token']);
                             return AlertDialog(
                               title: Text('삭제'),
                               content: Text('게시물 삭제하시겠습니까?'),
@@ -209,8 +200,7 @@ class _allDetailState extends State<allDetail> with AutomaticKeepAliveClientMixi
                                     Navigator.of(context).pop();
                                     Navigator.of(context).pop();
 
-                                    print(snapshot.data['id']);
-                                    var response = await http.delete(
+                                    await http.delete(
                                       Uri.http('13.125.62.90',
                                           'api/v1/BlogPosts/${widget.index}/'),
                                       headers: {
@@ -231,12 +221,13 @@ class _allDetailState extends State<allDetail> with AutomaticKeepAliveClientMixi
                             );
                           },
                         );
-                      }
-                      else if(result == 2) {
+                      } else if (result == 2) {
                         Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => WriterPost(userID : snapshot.data['owner'], nickname: snapshot.data['writer']))
-                        );
+                            MaterialPageRoute(
+                                builder: (context) => WriterPost(
+                                    userID: snapshot.data['owner'],
+                                    nickname: snapshot.data['writer'])));
                       }
                     },
                     itemBuilder: (context) => [
@@ -270,6 +261,7 @@ class _allDetailState extends State<allDetail> with AutomaticKeepAliveClientMixi
                   children: [
                     Expanded(
                       child: ListView(
+                        controller: _sc,
                         children: [
                           Container(
                             padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
@@ -309,7 +301,7 @@ class _allDetailState extends State<allDetail> with AutomaticKeepAliveClientMixi
                                                   Icon(Icons.thumb_up,
                                                       size: 13,
                                                       color: Colors.red),
-                                                 LikeCount(likecount),
+                                                  LikeCount(likecount),
                                                   SizedBox(width: 10),
                                                   Icon(Icons.comment,
                                                       size: 13,
@@ -331,9 +323,7 @@ class _allDetailState extends State<allDetail> with AutomaticKeepAliveClientMixi
                                                 child: OutlinedButton.icon(
                                                   onPressed: () async {
                                                     await doLikes();
-                                                    setState(() {
-
-                                                    });
+                                                    setState(() {});
                                                   },
                                                   icon: Icon(
                                                     Icons.thumb_up,
@@ -349,37 +339,57 @@ class _allDetailState extends State<allDetail> with AutomaticKeepAliveClientMixi
                                     ],
                                   ),
                                 ),
-                                contentText(snapshot.data['content']), //내용
-                                SizedBox(height: 10),
-                                SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  child: Row(children: [
-                                    Container(
-                                      padding: EdgeInsets.all(5),
-                                      margin: EdgeInsets.fromLTRB(0, 0, 3, 0),
-                                      decoration: BoxDecoration(
-                                          color: Colors.blueAccent,
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(10))),
-                                      child: Text(
-                                        '연관 종목',
-                                        style: TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white),
-                                      ),
+                                contentText(snapshot.data['content']),
+
+                                if (snapshot.data['category'] != 'R')
+                                  SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(
+                                      children: [
+                                        if (snapshot
+                                                .data['taggittaggeditem_set']
+                                                .toString() !=
+                                            '[]')
+                                          Container(
+                                            padding: EdgeInsets.all(5),
+                                            margin:
+                                                EdgeInsets.fromLTRB(0, 0, 3, 0),
+                                            decoration: BoxDecoration(
+                                                color: Colors.blueAccent,
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(10))),
+                                            child: Text(
+                                              '연관 종목',
+                                              style: TextStyle(
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white),
+                                            ),
+                                          ),
+                                        for (Map i in snapshot
+                                            .data['taggittaggeditem_set'])
+                                          Container(
+                                            child: TextButton(
+                                              child: Text(
+                                                i['name'] + '  ',
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.blue),
+                                              ),
+                                              onPressed: () {
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            StoragePost(
+                                                                tag: i[
+                                                                    'name'])));
+                                              },
+                                            ),
+                                          ),
+                                      ],
                                     ),
-                                    for (Map i in snapshot
-                                        .data['taggittaggeditem_set'])
-                                      Container(
-                                          child: Text(
-                                        i['name'] + '  ',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.blue),
-                                      )),
-                                  ]),
-                                ),
+                                  ),
 
                                 //댓글 리스트
                                 Column(
@@ -403,7 +413,7 @@ class _allDetailState extends State<allDetail> with AutomaticKeepAliveClientMixi
                                       ),
                                     ),
                                     for (var i in snapshot
-                                        .data['blogpostcomment_set']) //댓글달기
+                                        .data['blogpostcomment_set']) //댓글리스트
                                       Container(
                                         padding: EdgeInsets.all(3),
                                         decoration: BoxDecoration(
@@ -421,7 +431,9 @@ class _allDetailState extends State<allDetail> with AutomaticKeepAliveClientMixi
                                                   Icon(Icons.person_outline),
                                                   Text(
                                                     i['user'],
-                                                    style: TextStyle(),
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w800),
                                                   ),
                                                 ]),
                                                 Row(
@@ -464,7 +476,10 @@ class _allDetailState extends State<allDetail> with AutomaticKeepAliveClientMixi
                                                                             },
                                                                           );
                                                                           setState(
-                                                                              () {});
+                                                                              () {
+                                                                            _future =
+                                                                                getPostData(widget.index, content);
+                                                                          });
                                                                           Navigator.of(context)
                                                                               .pop();
                                                                         },
@@ -536,13 +551,6 @@ class _allDetailState extends State<allDetail> with AutomaticKeepAliveClientMixi
                                             postComment(commentController.text);
                                             commentController.clear();
                                             currentFocus.unfocus();
-
-                                            _sc.animateTo(
-                                              _sc.position.maxScrollExtent,
-                                              duration: const Duration(
-                                                  milliseconds: 10),
-                                              curve: Curves.easeOut,
-                                            );
                                           },
                                           icon: Icon(Icons.send),
                                         ),
@@ -565,7 +573,12 @@ class _allDetailState extends State<allDetail> with AutomaticKeepAliveClientMixi
       ),
     );
   }
-  Widget LikeCount(int like) { //추천 갯수 업데이트하기위함
-    return Text(like.toString());
+
+  Widget LikeCount(int like) {
+    //추천 갯수 업데이트하기위함
+    return Text(
+      like.toString(),
+      style: TextStyle(color: Colors.red),
+    );
   }
 }

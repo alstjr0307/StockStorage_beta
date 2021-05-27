@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/all/allDetail.dart';
 
 import 'dart:async';
-import 'ForeignDetail.dart';
+
 import 'package:flutter_app/foreign/addPost.dart';
 import 'package:flutter_app/foreign/foriegnsearchpage.dart';
 import 'package:dio/dio.dart';
@@ -91,7 +92,7 @@ class _ForeignPostState extends State<ForeignPost>
         isLoading = true;
       });
 
-      var url = "http://13.125.62.90/api/v1/BlogPosts/?category=F&page=" +
+      var url = "http://13.125.62.90/api/v1/BlogPostsList/?category=F&page=" +
           (index + 1).toString();
       print('url'+url);
       final response = await dio.get(url);
@@ -206,7 +207,7 @@ class _ForeignPostState extends State<ForeignPost>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ForeignDetail(
+                            builder: (context) => allDetail(
                               index: posts[index]["id"],
                             ),
                           ),

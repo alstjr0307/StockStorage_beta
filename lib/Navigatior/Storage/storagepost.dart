@@ -88,7 +88,7 @@ class _StoragePostState extends State<StoragePost>
       print('idlist' +idlist);
       if (idlist != '') {
         print('1');
-        var url = "http://13.125.62.90/api/v1/BlogPosts/?id_in=${idlist}&page=" +
+        var url = "http://13.125.62.90/api/v1/BlogPostsList/?id_in=${idlist}&page=" +
             (index + 1).toString();
 
         final response = await dio.get(url);

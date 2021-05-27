@@ -6,7 +6,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
 import '../model.dart';
-import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart';
 import 'package:back_button_interceptor/back_button_interceptor.dart';
@@ -29,9 +30,9 @@ Widget contentText(String content) {
           border: Border(
               bottom: BorderSide(
                   color: Colors.black26, width: 1, style: BorderStyle.solid))),
-      child: Html(
-        data: content,
-
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(4,10,4,20),
+        child: HtmlWidget(content),
       ),
     ),
     scrollDirection: Axis.vertical,
@@ -131,7 +132,7 @@ Future<Map> getPostData(int postId, Map content) async {
   var sharedPreferences = await SharedPreferences.getInstance();
   var token = sharedPreferences.getString("token");
 
-  print( '포스트 $postId');
+  print('포스트 $postId');
   final response = await http.get(
     Uri.http('13.125.62.90', "api/v1/BlogPosts/${postId}/"),
   ); //게시물 가져오기
@@ -149,12 +150,10 @@ Future<Map> getPostData(int postId, Map content) async {
     for (var i in content['blogpostcomment_set']) {
       i['time'] = DateFormat("M월dd일 H:m").format(DateTime.parse(i['created']));
     }
-
+    print(content['taggittaggeditem_set']);
     return content;
   } else {
     // 만약 응답이 OK가 아니면, 에러를 던집니다.
     throw Exception('Failed to load post');
   }
-
-
 }

@@ -1,7 +1,9 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter_app/profile/kakaologin.dart';
 import 'package:flutter_app/profile/signup.dart';
 import 'package:http/http.dart' as http;
+import 'package:kakao_flutter_sdk/all.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../realhome.dart';
@@ -19,7 +21,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    print('1');
+
     return Scaffold(
       body: Container(
           decoration: BoxDecoration(
@@ -39,6 +41,16 @@ class _LoginPageState extends State<LoginPage> {
                     buttonSection(),
                     signupSection(),
                     goHome(),
+                    TextButton(
+                      child: Text('카카오계정 로그인'),
+                      onPressed: (){
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => KakaoLogin()));
+
+                      },
+                    )
                   ],
                 )),
     );

@@ -1,14 +1,10 @@
-
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/Navigatior/Storage/storagepost.dart';
 import 'package:flutter_app/search/allsearch.dart';
-import 'domestic/domesticDetail.dart';
-import 'foreign/ForeignDetail.dart';
+
 import 'foreign/ForeignPost.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-
-
 import 'dart:async';
 import 'all/allDetail.dart';
 
@@ -16,9 +12,6 @@ import 'all/allpost.dart';
 
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-
-import 'free/freeDetail.dart';
 import 'profile/profile.dart';
 
 import 'profile/loginpage.dart';
@@ -74,7 +67,6 @@ class _RealHomeState extends State<RealHome> {
     _future = getPostAll();
     checkLoginStatus();
     Timer.periodic(Duration(seconds: 3), (timer) {
-
       _scrollController.animateTo(
         (timer.tick % 6) *
             _scrollController.position.maxScrollExtent /
@@ -294,7 +286,10 @@ class _RealHomeState extends State<RealHome> {
           for (var i = 0; i < drawerlist.length; i++)
             ListTile(
               hoverColor: Colors.red,
-              title: Text(drawerlist[i], style: TextStyle(fontFamily: 'gyeongi'),),
+              title: Text(
+                drawerlist[i],
+                style: TextStyle(fontFamily: 'gyeongi'),
+              ),
               onTap: () {
                 setState(() {
                   Navigator.pop(context);
@@ -349,8 +344,11 @@ class _RealHomeState extends State<RealHome> {
                         onPressed: () {
                           setState(() {
                             this.actionIcon = new Icon(Icons.search);
-                            this.appBarTitle = new Text("주식 저장소 홈",
-                                style: TextStyle(fontFamily: 'gyeongi'));
+                            this.appBarTitle = new Row(children: [
+                              Text("주식저장소 홈",
+                                  style: TextStyle(fontFamily: 'gyeongi')),
+                              Icon(Icons.bar_chart),
+                            ]);
                           });
 
                           if (searchcontroller.text != '') {
@@ -366,8 +364,10 @@ class _RealHomeState extends State<RealHome> {
               } else {
                 print(searchcontroller.text);
                 this.actionIcon = new Icon(Icons.search);
-                this.appBarTitle = new Text("주식 저장소 홈",
-                    style: TextStyle(fontFamily: 'gyeongi'));
+                this.appBarTitle = new Row(children: [
+                  Text("주식저장소 홈", style: TextStyle(fontFamily: 'gyeongi')),
+                  Icon(Icons.bar_chart),
+                ]);
               }
             });
           },
@@ -441,9 +441,9 @@ Widget Stock(String taglist, List output, BuildContext context,
     ScrollController _scrollController) {
   return Container(
       child: Card(
-          color: Colors.white60,
+          color: Colors.white,
           elevation: 1,
-          shadowColor: Colors.red,
+          shadowColor: Colors.blueAccent,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -467,20 +467,27 @@ Widget Stock(String taglist, List output, BuildContext context,
                           itemCount: output.length,
                           itemBuilder: (context, index) {
                             return Container(
-                              color: Colors.white54,
+                                color: Colors.white24,
                                 height: 50,
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     TextButton(
-
-                                      child: Text(output[index],
-                                          style: TextStyle(
-                                            fontFamily: 'gyeongi',
-                                              color: Colors.black54,
-                                              fontWeight: FontWeight.w800))
-                                    ),
+                                        child: Text(output[index],
+                                            style: TextStyle(
+                                                fontFamily: 'gyeongi',
+                                                color: Colors.black54,
+                                                fontWeight: FontWeight.w800)),
+                                        onPressed: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      StoragePost(
+                                                        tag: output[index]
+                                                        )));
+                                        }),
                                   ],
                                 ));
                           },
@@ -615,7 +622,7 @@ Widget PostFor(List posts, BuildContext context) {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => ForeignDetail(
+                              builder: (context) => allDetail(
                                     index: posts[i]['id'],
                                   )));
                     },
@@ -684,7 +691,7 @@ Widget PostDom(List posts, BuildContext context) {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => DomesticDetail(
+                              builder: (context) => allDetail(
                                     index: posts[i]['id'],
                                   )));
                     },
@@ -751,7 +758,7 @@ Widget PostFree(List posts, BuildContext context) {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => FreeDetail(
+                              builder: (context) => allDetail(
                                     index: posts[i]['id'],
                                   )));
                     },

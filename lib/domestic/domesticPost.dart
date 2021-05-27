@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/all/allDetail.dart';
 import 'domesticsearchpage.dart';
 
 import 'dart:async';
-
 import 'addPost.dart';
-import 'domesticDetail.dart';
-
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'package:intl/intl.dart';
-
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class DomesticPost extends StatefulWidget {
@@ -94,7 +90,7 @@ class _DomesticPostState extends State<DomesticPost>
         isLoading = true;
       });
 
-      var url = "http://13.125.62.90/api/v1/BlogPosts/?category=D&page=" +
+      var url = "http://13.125.62.90/api/v1/BlogPostsList/?category=D&page=" +
           (index + 1).toString();
       print('url'+url);
       final response = await dio.get(url);
@@ -209,7 +205,7 @@ class _DomesticPostState extends State<DomesticPost>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => DomesticDetail(
+                            builder: (context) => allDetail(
                               index: posts[index]["id"],
                             ),
                           ),

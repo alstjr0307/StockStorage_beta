@@ -6,7 +6,7 @@ import 'package:searchable_dropdown/searchable_dropdown.dart';
 import 'dart:async';
 
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:aws_s3/aws_s3.dart';
 import 'package:intl/intl.dart';
 import 'dart:convert';
 import 'package:html_editor_enhanced/html_editor.dart';
@@ -151,6 +151,7 @@ class _AddPostState extends State<AddPost> {
                       print(url);
                       return true;
                     },
+
                     mediaUploadInterceptor:
                         (PlatformFile file, InsertFileType type) async {
                       print(file.name); //filename

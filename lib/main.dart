@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:kakao_flutter_sdk/all.dart';
 
 import 'profile/loginpage.dart';
 
@@ -9,9 +11,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'realhome.dart';
 
 import 'package:flex_color_scheme/flex_color_scheme.dart';
+
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   MobileAds.instance.initialize();
+  KakaoContext.clientId = "96a3a0f35c7663fd62bf9870fd20e434";
+  KakaoContext.javascriptClientId = "60a803fedcf53b21f91dcd17a7cc39f9";
+
   runApp(MyApp());
 }
 

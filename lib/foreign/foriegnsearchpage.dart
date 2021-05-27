@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/all/allDetail.dart';
 
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'ForeignDetail.dart';
 class ForeignSearchPage extends StatefulWidget {
   @override
   _ForeignSearchPageState createState() => _ForeignSearchPageState();
@@ -340,7 +340,7 @@ class _ForeignSearchPageState extends State<ForeignSearchPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ForeignDetail(
+                            builder: (context) =>allDetail(
                               index: posts[index]["id"],
                             ),
                           ),
